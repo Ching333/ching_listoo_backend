@@ -1,0 +1,563 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="FUENMLModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="place">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="longitude" Type="decimal" Precision="11" Scale="8" Nullable="false" />
+          <Property Name="latitude" Type="decimal" Precision="11" Scale="8" Nullable="false" />
+          <Property Name="phone" Type="nvarchar" MaxLength="50" />
+          <Property Name="address" Type="nvarchar" MaxLength="50" />
+          <Property Name="type" Type="nvarchar(max)" />
+          <Property Name="gmap_id" Type="nvarchar(max)" />
+        </EntityType>
+        <EntityType Name="placeList">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="description" Type="varchar" MaxLength="255" />
+          <Property Name="privacy" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="created" Type="datetime" Nullable="false" />
+          <Property Name="updated" Type="datetime" />
+          <Property Name="cover" Type="varbinary" MaxLength="1" />
+        </EntityType>
+        <EntityType Name="placeRelation">
+          <Key>
+            <PropertyRef Name="place_id" />
+            <PropertyRef Name="placeList_id" />
+          </Key>
+          <Property Name="place_id" Type="int" Nullable="false" />
+          <Property Name="placeList_id" Type="int" Nullable="false" />
+          <Property Name="created" Type="nchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="tag">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="30" Nullable="false" />
+          <Property Name="type" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tagEvent">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="tag_id" Type="int" />
+          <Property Name="event" Type="int" />
+          <Property Name="created" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="tagRelation">
+          <Key>
+            <PropertyRef Name="place_id" />
+            <PropertyRef Name="tag_id" />
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="place_id" Type="int" Nullable="false" />
+          <Property Name="tag_id" Type="int" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="created" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="email" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="password" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="authority" Type="int" Nullable="false" />
+          <Property Name="updated" Type="datetime2" Precision="0" />
+          <Property Name="created" Type="datetime2" Precision="0" />
+        </EntityType>
+        <Association Name="fk_placeList_user_1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="placeList" Type="Self.placeList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="placeList">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_placeRelation_place_1">
+          <End Role="place" Type="Self.place" Multiplicity="1" />
+          <End Role="placeRelation" Type="Self.placeRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="place">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="placeRelation">
+              <PropertyRef Name="place_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_placeRelation_placeList_1">
+          <End Role="placeList" Type="Self.placeList" Multiplicity="1" />
+          <End Role="placeRelation" Type="Self.placeRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="placeList">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="placeRelation">
+              <PropertyRef Name="placeList_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagEvent_tag_1">
+          <End Role="tag" Type="Self.tag" Multiplicity="0..1" />
+          <End Role="tagEvent" Type="Self.tagEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tag">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagEvent">
+              <PropertyRef Name="tag_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagEvent_user_1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="tagEvent" Type="Self.tagEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagEvent">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagRelation_place_1">
+          <End Role="place" Type="Self.place" Multiplicity="1" />
+          <End Role="tagRelation" Type="Self.tagRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="place">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagRelation">
+              <PropertyRef Name="place_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagRelation_tag_1">
+          <End Role="tag" Type="Self.tag" Multiplicity="1" />
+          <End Role="tagRelation" Type="Self.tagRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tag">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagRelation">
+              <PropertyRef Name="tag_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagRelation_user_1">
+          <End Role="user" Type="Self.user" Multiplicity="1" />
+          <End Role="tagRelation" Type="Self.tagRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagRelation">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="FUENMLModelStoreContainer">
+          <EntitySet Name="place" EntityType="Self.place" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="placeList" EntityType="Self.placeList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="placeRelation" EntityType="Self.placeRelation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tag" EntityType="Self.tag" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tagEvent" EntityType="Self.tagEvent" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="tagRelation" EntityType="Self.tagRelation" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="fk_placeList_user_1" Association="Self.fk_placeList_user_1">
+            <End Role="user" EntitySet="user" />
+            <End Role="placeList" EntitySet="placeList" />
+          </AssociationSet>
+          <AssociationSet Name="fk_placeRelation_place_1" Association="Self.fk_placeRelation_place_1">
+            <End Role="place" EntitySet="place" />
+            <End Role="placeRelation" EntitySet="placeRelation" />
+          </AssociationSet>
+          <AssociationSet Name="fk_placeRelation_placeList_1" Association="Self.fk_placeRelation_placeList_1">
+            <End Role="placeList" EntitySet="placeList" />
+            <End Role="placeRelation" EntitySet="placeRelation" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagEvent_tag_1" Association="Self.fk_tagEvent_tag_1">
+            <End Role="tag" EntitySet="tag" />
+            <End Role="tagEvent" EntitySet="tagEvent" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagEvent_user_1" Association="Self.fk_tagEvent_user_1">
+            <End Role="user" EntitySet="user" />
+            <End Role="tagEvent" EntitySet="tagEvent" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagRelation_place_1" Association="Self.fk_tagRelation_place_1">
+            <End Role="place" EntitySet="place" />
+            <End Role="tagRelation" EntitySet="tagRelation" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagRelation_tag_1" Association="Self.fk_tagRelation_tag_1">
+            <End Role="tag" EntitySet="tag" />
+            <End Role="tagRelation" EntitySet="tagRelation" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagRelation_user_1" Association="Self.fk_tagRelation_user_1">
+            <End Role="user" EntitySet="user" />
+            <End Role="tagRelation" EntitySet="tagRelation" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FUENMLModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityContainer Name="FUENMLEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="places" EntityType="FUENMLModel.place" />
+          <EntitySet Name="placeLists" EntityType="FUENMLModel.placeList" />
+          <EntitySet Name="placeRelations" EntityType="FUENMLModel.placeRelation" />
+          <EntitySet Name="tags" EntityType="FUENMLModel.tag" />
+          <EntitySet Name="tagEvents" EntityType="FUENMLModel.tagEvent" />
+          <EntitySet Name="tagRelations" EntityType="FUENMLModel.tagRelation" />
+          <EntitySet Name="users" EntityType="FUENMLModel.user" />
+          <AssociationSet Name="fk_placeRelation_place_1" Association="FUENMLModel.fk_placeRelation_place_1">
+            <End Role="place" EntitySet="places" />
+            <End Role="placeRelation" EntitySet="placeRelations" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagRelation_place_1" Association="FUENMLModel.fk_tagRelation_place_1">
+            <End Role="place" EntitySet="places" />
+            <End Role="tagRelation" EntitySet="tagRelations" />
+          </AssociationSet>
+          <AssociationSet Name="fk_placeList_user_1" Association="FUENMLModel.fk_placeList_user_1">
+            <End Role="user" EntitySet="users" />
+            <End Role="placeList" EntitySet="placeLists" />
+          </AssociationSet>
+          <AssociationSet Name="fk_placeRelation_placeList_1" Association="FUENMLModel.fk_placeRelation_placeList_1">
+            <End Role="placeList" EntitySet="placeLists" />
+            <End Role="placeRelation" EntitySet="placeRelations" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagEvent_tag_1" Association="FUENMLModel.fk_tagEvent_tag_1">
+            <End Role="tag" EntitySet="tags" />
+            <End Role="tagEvent" EntitySet="tagEvents" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagRelation_tag_1" Association="FUENMLModel.fk_tagRelation_tag_1">
+            <End Role="tag" EntitySet="tags" />
+            <End Role="tagRelation" EntitySet="tagRelations" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagEvent_user_1" Association="FUENMLModel.fk_tagEvent_user_1">
+            <End Role="user" EntitySet="users" />
+            <End Role="tagEvent" EntitySet="tagEvents" />
+          </AssociationSet>
+          <AssociationSet Name="fk_tagRelation_user_1" Association="FUENMLModel.fk_tagRelation_user_1">
+            <End Role="user" EntitySet="users" />
+            <End Role="tagRelation" EntitySet="tagRelations" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="place">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="true" />
+          <Property Name="longitude" Type="Decimal" Nullable="false" Precision="11" Scale="8" />
+          <Property Name="latitude" Type="Decimal" Nullable="false" Precision="11" Scale="8" />
+          <Property Name="phone" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="address" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="type" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="gmap_id" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="placeRelations" Relationship="FUENMLModel.fk_placeRelation_place_1" FromRole="place" ToRole="placeRelation" />
+          <NavigationProperty Name="tagRelations" Relationship="FUENMLModel.fk_tagRelation_place_1" FromRole="place" ToRole="tagRelation" />
+        </EntityType>
+        <EntityType Name="placeList">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="privacy" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="created" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="updated" Type="DateTime" Precision="3" />
+          <Property Name="cover" Type="Binary" MaxLength="1" FixedLength="false" />
+          <NavigationProperty Name="user" Relationship="FUENMLModel.fk_placeList_user_1" FromRole="placeList" ToRole="user" />
+          <NavigationProperty Name="placeRelations" Relationship="FUENMLModel.fk_placeRelation_placeList_1" FromRole="placeList" ToRole="placeRelation" />
+        </EntityType>
+        <EntityType Name="placeRelation">
+          <Key>
+            <PropertyRef Name="place_id" />
+            <PropertyRef Name="placeList_id" />
+          </Key>
+          <Property Name="place_id" Type="Int32" Nullable="false" />
+          <Property Name="placeList_id" Type="Int32" Nullable="false" />
+          <Property Name="created" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+          <NavigationProperty Name="place" Relationship="FUENMLModel.fk_placeRelation_place_1" FromRole="placeRelation" ToRole="place" />
+          <NavigationProperty Name="placeList" Relationship="FUENMLModel.fk_placeRelation_placeList_1" FromRole="placeRelation" ToRole="placeList" />
+        </EntityType>
+        <EntityType Name="tag">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="true" />
+          <Property Name="type" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="tagEvents" Relationship="FUENMLModel.fk_tagEvent_tag_1" FromRole="tag" ToRole="tagEvent" />
+          <NavigationProperty Name="tagRelations" Relationship="FUENMLModel.fk_tagRelation_tag_1" FromRole="tag" ToRole="tagRelation" />
+        </EntityType>
+        <EntityType Name="tagEvent">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="tag_id" Type="Int32" />
+          <Property Name="event" Type="Int32" />
+          <Property Name="created" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="tag" Relationship="FUENMLModel.fk_tagEvent_tag_1" FromRole="tagEvent" ToRole="tag" />
+          <NavigationProperty Name="user" Relationship="FUENMLModel.fk_tagEvent_user_1" FromRole="tagEvent" ToRole="user" />
+        </EntityType>
+        <EntityType Name="tagRelation">
+          <Key>
+            <PropertyRef Name="place_id" />
+            <PropertyRef Name="tag_id" />
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="place_id" Type="Int32" Nullable="false" />
+          <Property Name="tag_id" Type="Int32" Nullable="false" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="created" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="place" Relationship="FUENMLModel.fk_tagRelation_place_1" FromRole="tagRelation" ToRole="place" />
+          <NavigationProperty Name="tag" Relationship="FUENMLModel.fk_tagRelation_tag_1" FromRole="tagRelation" ToRole="tag" />
+          <NavigationProperty Name="user" Relationship="FUENMLModel.fk_tagRelation_user_1" FromRole="tagRelation" ToRole="user" />
+        </EntityType>
+        <EntityType Name="user">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="email" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="password" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="authority" Type="Int32" Nullable="false" />
+          <Property Name="updated" Type="DateTime" Precision="0" />
+          <Property Name="created" Type="DateTime" Precision="0" />
+          <NavigationProperty Name="placeLists" Relationship="FUENMLModel.fk_placeList_user_1" FromRole="user" ToRole="placeList" />
+          <NavigationProperty Name="tagEvents" Relationship="FUENMLModel.fk_tagEvent_user_1" FromRole="user" ToRole="tagEvent" />
+          <NavigationProperty Name="tagRelations" Relationship="FUENMLModel.fk_tagRelation_user_1" FromRole="user" ToRole="tagRelation" />
+        </EntityType>
+        <Association Name="fk_placeRelation_place_1">
+          <End Type="FUENMLModel.place" Role="place" Multiplicity="1" />
+          <End Type="FUENMLModel.placeRelation" Role="placeRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="place">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="placeRelation">
+              <PropertyRef Name="place_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagRelation_place_1">
+          <End Type="FUENMLModel.place" Role="place" Multiplicity="1" />
+          <End Type="FUENMLModel.tagRelation" Role="tagRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="place">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagRelation">
+              <PropertyRef Name="place_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_placeList_user_1">
+          <End Type="FUENMLModel.user" Role="user" Multiplicity="1" />
+          <End Type="FUENMLModel.placeList" Role="placeList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="placeList">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_placeRelation_placeList_1">
+          <End Type="FUENMLModel.placeList" Role="placeList" Multiplicity="1" />
+          <End Type="FUENMLModel.placeRelation" Role="placeRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="placeList">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="placeRelation">
+              <PropertyRef Name="placeList_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagEvent_tag_1">
+          <End Type="FUENMLModel.tag" Role="tag" Multiplicity="0..1" />
+          <End Type="FUENMLModel.tagEvent" Role="tagEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tag">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagEvent">
+              <PropertyRef Name="tag_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagRelation_tag_1">
+          <End Type="FUENMLModel.tag" Role="tag" Multiplicity="1" />
+          <End Type="FUENMLModel.tagRelation" Role="tagRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="tag">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagRelation">
+              <PropertyRef Name="tag_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagEvent_user_1">
+          <End Type="FUENMLModel.user" Role="user" Multiplicity="1" />
+          <End Type="FUENMLModel.tagEvent" Role="tagEvent" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagEvent">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_tagRelation_user_1">
+          <End Type="FUENMLModel.user" Role="user" Multiplicity="1" />
+          <End Type="FUENMLModel.tagRelation" Role="tagRelation" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="user">
+              <PropertyRef Name="id" />
+            </Principal>
+            <Dependent Role="tagRelation">
+              <PropertyRef Name="user_id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FUENMLModelStoreContainer" CdmEntityContainer="FUENMLEntities">
+          <EntitySetMapping Name="places">
+            <EntityTypeMapping TypeName="FUENMLModel.place">
+              <MappingFragment StoreEntitySet="place">
+                <ScalarProperty Name="gmap_id" ColumnName="gmap_id" />
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="address" ColumnName="address" />
+                <ScalarProperty Name="phone" ColumnName="phone" />
+                <ScalarProperty Name="latitude" ColumnName="latitude" />
+                <ScalarProperty Name="longitude" ColumnName="longitude" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="placeLists">
+            <EntityTypeMapping TypeName="FUENMLModel.placeList">
+              <MappingFragment StoreEntitySet="placeList">
+                <ScalarProperty Name="cover" ColumnName="cover" />
+                <ScalarProperty Name="updated" ColumnName="updated" />
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="privacy" ColumnName="privacy" />
+                <ScalarProperty Name="description" ColumnName="description" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="placeRelations">
+            <EntityTypeMapping TypeName="FUENMLModel.placeRelation">
+              <MappingFragment StoreEntitySet="placeRelation">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="placeList_id" ColumnName="placeList_id" />
+                <ScalarProperty Name="place_id" ColumnName="place_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tags">
+            <EntityTypeMapping TypeName="FUENMLModel.tag">
+              <MappingFragment StoreEntitySet="tag">
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tagEvents">
+            <EntityTypeMapping TypeName="FUENMLModel.tagEvent">
+              <MappingFragment StoreEntitySet="tagEvent">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="event" ColumnName="event" />
+                <ScalarProperty Name="tag_id" ColumnName="tag_id" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="tagRelations">
+            <EntityTypeMapping TypeName="FUENMLModel.tagRelation">
+              <MappingFragment StoreEntitySet="tagRelation">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="tag_id" ColumnName="tag_id" />
+                <ScalarProperty Name="place_id" ColumnName="place_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="users">
+            <EntityTypeMapping TypeName="FUENMLModel.user">
+              <MappingFragment StoreEntitySet="user">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="updated" ColumnName="updated" />
+                <ScalarProperty Name="authority" ColumnName="authority" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="無" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

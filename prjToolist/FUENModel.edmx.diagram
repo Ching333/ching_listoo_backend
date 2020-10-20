@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="f178d7e87db0467fa1eaee7f04917ef6" Name="Diagram1">
+        <EntityTypeShape EntityType="FUENMLModel.place" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="FUENMLModel.placeList" Width="1.5" PointX="3" PointY="10.875" />
+        <EntityTypeShape EntityType="FUENMLModel.placeRelation" Width="1.5" PointX="5.25" PointY="11.25" />
+        <EntityTypeShape EntityType="FUENMLModel.tag" Width="1.5" PointX="3.75" PointY="2.25" />
+        <EntityTypeShape EntityType="FUENMLModel.tagEvent" Width="1.5" PointX="6" PointY="5" />
+        <EntityTypeShape EntityType="FUENMLModel.tagRelation" Width="1.5" PointX="3" PointY="5" />
+        <EntityTypeShape EntityType="FUENMLModel.user" Width="1.5" PointX="0.75" PointY="4.75" />
+        <AssociationConnector Association="FUENMLModel.fk_placeRelation_place_1" />
+        <AssociationConnector Association="FUENMLModel.fk_tagRelation_place_1" />
+        <AssociationConnector Association="FUENMLModel.fk_placeList_user_1" />
+        <AssociationConnector Association="FUENMLModel.fk_placeRelation_placeList_1" />
+        <AssociationConnector Association="FUENMLModel.fk_tagEvent_tag_1" />
+        <AssociationConnector Association="FUENMLModel.fk_tagRelation_tag_1" />
+        <AssociationConnector Association="FUENMLModel.fk_tagEvent_user_1" />
+        <AssociationConnector Association="FUENMLModel.fk_tagRelation_user_1" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
