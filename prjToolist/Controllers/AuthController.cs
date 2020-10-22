@@ -98,8 +98,8 @@ namespace prjToolist.Controllers
                 var cookie = new CookieHeaderValue("session-id", "")
                 {
                     Expires = DateTimeOffset.Now.AddDays(-1),
-                    Domain = currentCookie.Domain,
-                    Path = currentCookie.Path
+                    //Domain = currentCookie.Domain,
+                    //Path = currentCookie.Path
                 };
                 resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
             }
