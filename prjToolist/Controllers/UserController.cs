@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using static prjToolist.Controllers.CommonController;
@@ -19,47 +21,98 @@ namespace prjToolist.Controllers
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage get_user_lists([FromBody] tagString s)
         {
+            //var result = new
+            //{
+            //    status = 0,
+            //    msg = $"fail",
+            //    data = 0
+            //};
+
             int userlogin = 0;
             int[] tFilterid = tagStringToId(s);
             List<int> userList = new List<int>();
+            List<int> placesList = new List<int>();
+            List<int> tagsList = new List<int>();
             List<int> unionResult = new List<int>();
-            var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
-            if (currentCookie != null)
-            {
-                userlogin = int.Parse(currentCookie.ToString());
-                userList = db.placeLists.Where(p => p.user_id == userlogin).Select(q => q.id).ToList();
+            //var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
+            userlogin = int.Parse(Request.Headers.GetValues("session-id").FirstOrDefault());
+            
+            //string sessionId = "";
 
-            }
+            //CookieHeaderValue currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
+
+
+            //if (currentCookie != null)
+            //{
+            //sessionId = currentCookie["session-id"].Value;
+            //userlogin = int.Parse(currentCookie.ToString());
+            userList = db.placeLists.Where(p => p.user_id == userlogin).Select(q => q.id).ToList();
+
+            //}
+            //    string sessionId = "";
+
+            //    CookieHeaderValue cookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
+            //    if (cookie != null)
+            //    {
+
+            //        sessionId = cookie["session-id"].Value;
+            //    }
+            var result = new
+            {
+                userList1 = userList
+            };
+
+            
+
+
+            //if (userList != null)
+            //{
+            //    result = new
+            //    {
+            //        status = 1,
+            //        msg = "Sucess",
+            //        data = userList[0]
+            //    };
+            //}
             if (tFilterid != null)
             {
                 foreach (int i in tFilterid)
                 {
-                    
-                    var placesList = db.tagRelations.Where(p => p.tag_id == i && p.user_id == userlogin).Select(q => q.place_id).ToArray();
-                    foreach (int j in placesList)
-                    {
-                        var tagList = db.placeRelations.Where(p => p.place_id == j).Select(q => q.placeList_id).ToArray();
-                        foreach(int k in tagList)
-                        {
-                            var List = db.placeLists.Where(p => p.id == k).Select(q => q.id);
-                            unionResult= userList.Union(List).ToList();
-                        }
-                        
-                        
-                    }
+                    placesList.AddRange(db.tagRelations.Where(p => p.tag_id == i).Select(q => q.place_id).ToList());
+                    //placesList = db.tagRelations.Where(p => p.tag_id == i).Select(q => q.place_id).ToList();
+                    //placesList = db.tagRelations.Where(p => p.tag_id == i && p.user_id == userlogin).Select(q => q.place_id).ToList();
+                    //foreach (int j in placesList)
+                    //{
+                    //    var tagList = db.placeRelations.Where(p => p.place_id == j).Select(q => q.placeList_id).ToArray();
+                    //    foreach (int k in tagList)
+                    //    {
+                    //        var List = db.placeLists.Where(p => p.id == k).Select(q => q.id);
+                    //        unionResult = userList.Union(List).ToList();
+                    //    }
+
+
+                    //}
 
 
                 }
+                placesList = placesList.Distinct().ToList();
+                foreach (int j in placesList)
+                {
+                    tagsList.AddRange(db.placeRelations.Where(p => p.place_id == j).Select(q => q.placeList_id).ToList());
+                    Debug.WriteLine("1");
+                }
+                
+                tagsList = tagsList.Distinct().ToList();
+                result = new
+                {
+                    userList1 = tagsList
+                    //userList1 = placesList
+                    };
             }
 
+           
 
 
-            var result = new
-            {
-                status = 0,
-                msg = $"fail",
-                data = s
-            };
 
             //result ={
             //status: 1,data:{lists: [List]},msg: "",}
