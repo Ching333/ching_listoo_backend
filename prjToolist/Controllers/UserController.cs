@@ -21,12 +21,7 @@ namespace prjToolist.Controllers
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage get_user_lists([FromBody] tagString s)
         {
-            //var result = new
-            //{
-            //    status = 0,
-            //    msg = $"fail",
-            //    data = 0
-            //};
+           
 
             int userlogin = 0;
             int[] tFilterid = tagStringToId(s);
@@ -34,9 +29,29 @@ namespace prjToolist.Controllers
             List<int> placesList = new List<int>();
             List<int> tagsList = new List<int>();
             List<int> unionResult = new List<int>();
+            List<placeListInfo> infoList = new List<placeListInfo>();
+
+
+
+            var dataForm = new
+            {
+                list = infoList,
+
+            };
+
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = dataForm
+            };
+
+
             //var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
+            if (Request.Headers.Contains("session-id")) {
             userlogin = int.Parse(Request.Headers.GetValues("session-id").FirstOrDefault());
-            
+            }
+
             //string sessionId = "";
 
             //CookieHeaderValue currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
@@ -46,8 +61,36 @@ namespace prjToolist.Controllers
             //{
             //sessionId = currentCookie["session-id"].Value;
             //userlogin = int.Parse(currentCookie.ToString());
-            userList = db.placeLists.Where(p => p.user_id == userlogin).Select(q => q.id).ToList();
+            if (userlogin != 0) { 
+                userList = db.placeLists.Where(p => p.user_id == userlogin).Select(q => q.id).ToList();
+                if (userList != null) { 
+                    foreach (int r in userList)
+                    {
+                        placeListInfo infoItem = new placeListInfo();
+                        var li = db.placeLists.Where(p => p.id == r && p.user_id == userlogin).Select(q => q).FirstOrDefault();
+                        if (li != null)
+                        {
+                            infoItem.userId = li.user_id;
+                            infoItem.name = li.name;
+                            infoItem.description = li.description;
+                            infoItem.privacy = li.privacy;
+                            infoItem.createdTime = li.created.ToString();
+                            infoItem.updatedTime = li.updated.ToString();
+                            //byte[] binaryString = (byte[])place.cover;
+                            //info.cover = Encoding.UTF8.GetString(binaryString);
+                            infoList.Add(infoItem);
+                        }
+                    }
+                }
+                result = new
+                {
+                    status = 1,
+                    msg = "Sucess",
+                    data = dataForm
+                };
+            }
 
+           
             //}
             //    string sessionId = "";
 
@@ -57,12 +100,12 @@ namespace prjToolist.Controllers
 
             //        sessionId = cookie["session-id"].Value;
             //    }
-            var result = new
-            {
-                userList1 = userList
-            };
+            //var result = new
+            //{
+            //    userList1 = userList
+            //};
 
-            
+
 
 
             //if (userList != null)
@@ -103,16 +146,54 @@ namespace prjToolist.Controllers
                 }
                 
                 tagsList = tagsList.Distinct().ToList();
+                //result = new
+                //{
+                //    userList1 = tagsList
+                //    //userList1 = placesList
+                //    };
+            }
+            
+            if (tagsList.Count>0&& userlogin != 0) {
+                infoList= new List<placeListInfo>();
+                foreach (int r in tagsList)
+                {   placeListInfo infoItem = new placeListInfo();
+                    var li= db.placeLists.Where(p => p.id == r&&p.user_id==userlogin).Select(q => q).FirstOrDefault();
+                    if (li != null)
+                    { 
+                    infoItem.userId = li.user_id;
+                    infoItem.name = li.name;
+                    infoItem.description = li.description;
+                    infoItem.privacy = li.privacy;
+                    infoItem.createdTime = li.created.ToString();
+                    infoItem.updatedTime = li.updated.ToString();
+                    //byte[] binaryString = (byte[])place.cover;
+                    //info.cover = Encoding.UTF8.GetString(binaryString);
+                    infoList.Add(infoItem);
+                    }
+                }
                 result = new
                 {
-                    userList1 = tagsList
-                    //userList1 = placesList
-                    };
+                    status = 1,
+                    msg = "Sucess",
+                    data = dataForm
+                };
             }
+            
+            
 
+            //if (infoList.Count()>0)
+            //{
+            //    result = new
+            //    {
+            //        status = 1,
+            //        msg = "Sucess",
+            //        data = dataForm
+            //    };
+            //}
+            
            
-
-
+            
+           
 
             //result ={
             //status: 1,data:{lists: [List]},msg: "",}
