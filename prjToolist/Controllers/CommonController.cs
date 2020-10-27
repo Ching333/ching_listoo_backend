@@ -1,4 +1,5 @@
-﻿using System;
+﻿using prjToolist.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -19,19 +20,20 @@ namespace prjToolist.Controllers
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage GetList(int list_id, tagString s)
         {
-            //獲取某特定清單中含有標籤的地點資訊
+            //獲取某特定清單中含有標籤的地點id
             List<int> resultplaceid= new List<int>();
-            int[] tFilterid=checktagString(s);
-            var searchplaceinlist = db.placeRelations.Where(p => p.placeList_id == list_id)
+            int[] tFilterid=tagFactory.checktagString(s, db);
+            var searchallplaceinlist = db.placeRelations.Where(p => p.placeList_id == list_id)
                 .Select(q => q.place_id).ToList();
-            List<int> unionResult = new List<int>();
+            //此結果為特定清單中篩選出的地點id
+            List<int> intersectResult = searchallplaceinlist;
             if (tFilterid != null) { 
             foreach (int i in tFilterid) {
                 var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
-                unionResult = searchplaceinlist.Union(searchplacehastag).ToList();
-                foreach(int p in unionResult) {
-                    resultplaceid.Add(p);
-                }
+                intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
+                //foreach(int p in unionResult) {
+                //    resultplaceid.Add(p);
+                //}
               }
             }
             //============================================
@@ -142,34 +144,8 @@ namespace prjToolist.Controllers
             public int type { get; set; }
         }
 
-        public class tagString
-        {
-            public string[] tag_str { get; set; }
-        }
-        public  int[] checktagString(tagString s)
-        {   //用於新增TAG
-            List<int> tag_id = new List<int>();
-            foreach (string item in s.tag_str)
-            {
-                if (!(db.tags.Where(q => q.name == item)).Any())
-                {
-
-                    tag newtag = new tag();
-                    newtag.name = item;
-                    newtag.type = 1;
-                    db.tags.Add(newtag);
-
-                }
-                var tagid = from p in db.tags
-                            where (p.name == item)
-                            select p;
-                foreach (tag t in tagid)
-                {
-                    tag_id.Add(t.id);
-                }
-            }
-            return tag_id.Distinct().ToArray();
-        }
+        
+        
 
         
     }
