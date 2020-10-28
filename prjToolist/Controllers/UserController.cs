@@ -25,7 +25,8 @@ namespace prjToolist.Controllers
            
 
             int userlogin = 0;
-            int[] tFilterid = tagFactory.tagStringToId(s, db);
+            //int[] tFilterid = tagFactory.tagStringToId(s, db);
+            int[] tFilterid = new int[]{ 1,2};
             List<int> userList = new List<int>();
             List<int> placesList = new List<int>();
             List<int> tagsList = new List<int>();
@@ -38,7 +39,7 @@ namespace prjToolist.Controllers
             {
                 list = infoList,
                 tags= tagsList,
-                places=placesList
+                places= intersectResult
             };
 
             var result = new
@@ -86,6 +87,7 @@ namespace prjToolist.Controllers
                             //info.cover = Encoding.UTF8.GetString(binaryString);
                             infoList.Add(infoItem);
                         }
+                        intersectResult=intersectResult.Distinct().ToList();
                     }
                 }
                 result = new
@@ -102,6 +104,7 @@ namespace prjToolist.Controllers
                 foreach (int i in tFilterid)
                 {
                     var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
+                    searchplacehastag=searchplacehastag.Distinct().ToList();
                     intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
                     
 
@@ -126,7 +129,13 @@ namespace prjToolist.Controllers
                 {
                     list = infoList,
                     tags = tagsList,
-                    places = placesList
+                    places = intersectResult//地點編號
+                };
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = dataForm
                 };
 
             }
