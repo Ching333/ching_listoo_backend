@@ -19,5 +19,18 @@ namespace prjToolist
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
+
+        //在web api加入Session的方式 加入以下方法一
+        protected void Application_PostAuthorizeRequest()
+        {
+            System.Web.HttpContext.Current.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Required);
+        }
+
+        //在web api加入Session的方式 加入以下方法二
+        //public override void Init()
+        //{
+        //    this.PostAuthenticateRequest += (sender, e) => HttpContext.Current.SetSessionStateBehavior(System.Web.SessionState.SessionStateBehavior.Required);
+        //    base.Init();
+        //}
     }
 }

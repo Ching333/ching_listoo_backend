@@ -28,42 +28,43 @@ namespace prjToolist.Controllers
         public HttpResponseMessage loginPost([FromBody] memberLogin loginUser)
         {
             var verifyAccount = db.users.FirstOrDefault(P => P.email == loginUser.account && P.password == loginUser.password);
-            var cookie = new CookieHeaderValue("session-id", verifyAccount.id.ToString());
-            cookie.Expires = DateTimeOffset.Now.AddDays(1);
+            //var cookie = new CookieHeaderValue("session-id", verifyAccount.id.ToString());
+            //cookie.Expires = DateTimeOffset.Now.AddDays(1);
             //cookie.Domain = Request.RequestUri.Host;
             //cookie.Path = "/";
             var resultUsername = new
             {
-                username = verifyAccount.name
+                username = ""
             };
             var result = new
             {
                 status = 0,
-                msg = $"fail, {verifyAccount.name} doesn't exist",
+                msg = $"fail, {loginUser.account} doesn't exist or password is incorrect",
                 data = resultUsername
             };
-            var resp = Request.CreateResponse(
-            HttpStatusCode.OK,
-            result
-            );
-
             if (verifyAccount != null)
             {
+                HttpContext.Current.Session["SK_login"] = verifyAccount;
+
+                resultUsername = new
+                {
+                    username = verifyAccount.name
+                };
                 result = new
                 {
                     status = 1,
                     msg = "",
                     data = resultUsername
                 };
-                resp = Request.CreateResponse(
-                    HttpStatusCode.OK,
-                    result
-                );
-                resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
+                //resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
                 //resp.RequestMessage.Content = result;
                 //var reqResult = Request.CreateResponse(HttpStatusCode.OK, result);
             }
             //return Request.CreateResponse(HttpStatusCode.OK, resp);
+            var resp = Request.CreateResponse(
+           HttpStatusCode.OK,
+           result
+           );
             return resp;
         }
 
@@ -83,27 +84,36 @@ namespace prjToolist.Controllers
            
             //============================================================
 
-            var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
+            //var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
             var result = new
             {
-                status = 1,
-                msg = ""
+                status = 0,
+                msg = "fail"
             };
+            
+            //if (currentCookie != null)
+            //{
+            //    var cookie = new CookieHeaderValue("session-id", "")
+            //    {
+            //        Expires = DateTimeOffset.Now.AddDays(-1),
+            //        //Domain = currentCookie.Domain,
+            //        //Path = currentCookie.Path
+            //    };
+            //    resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
+            //}
+            if(HttpContext.Current.Session["SK_login"] != null)
+            {
+                HttpContext.Current.Session["SK_login"] = null;
+                result = new
+                {
+                    status = 1,
+                    msg = "logout success"
+                };
+            }
             var resp = Request.CreateResponse(
                 HttpStatusCode.OK,
                 result
             );
-            if (currentCookie != null)
-            {
-                var cookie = new CookieHeaderValue("session-id", "")
-                {
-                    Expires = DateTimeOffset.Now.AddDays(-1),
-                    //Domain = currentCookie.Domain,
-                    //Path = currentCookie.Path
-                };
-                resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
-            }
-
             //var result = new
             //{
             //    status = 1,
@@ -122,7 +132,7 @@ namespace prjToolist.Controllers
             var result = new
             {
                 status = 0,
-                msg = "fail",
+                msg = "fail,email exist",
             };
             if (isnullormember == null)
             {
@@ -138,10 +148,101 @@ namespace prjToolist.Controllers
                 result = new
                 {
                     status = 1,
-                    msg = "",
+                    msg = "success register",
                 };
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-    }
+
+        [Route("login2")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage loginPost2([FromBody] memberLogin loginUser)
+        {
+            
+            var verifyAccount = db.users.FirstOrDefault(P => P.email == loginUser.account && P.password == loginUser.password);
+            //var cookie = new CookieHeaderValue("session-id", verifyAccount.id.ToString());
+            //cookie.Expires = DateTimeOffset.Now.AddDays(1);
+            //cookie.Domain = Request.RequestUri.Host;
+            //cookie.Path = "/";
+            var resultUsername = new
+            {
+                username = ""
+            };
+            var result = new
+            {
+                status = 0,
+                msg = $"fail, {loginUser.account} doesn't exist",
+                data = resultUsername
+            };
+            var resp = Request.CreateResponse(
+            HttpStatusCode.OK,
+            result
+            );
+
+            if (verifyAccount != null)
+            {
+
+                HttpContext.Current.Session["SK_login"] = verifyAccount;
+
+                resultUsername = new
+                {
+                    username = verifyAccount.name
+                };
+
+               
+                result = new
+                {
+                    status = 1,
+                    msg = "",
+                    data = resultUsername
+                };
+                resp = Request.CreateResponse(
+                    HttpStatusCode.OK,
+                    result
+                );
+                //resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
+                //resp.RequestMessage.Content = result;
+                //var reqResult = Request.CreateResponse(HttpStatusCode.OK, result);
+            }
+            //return Request.CreateResponse(HttpStatusCode.OK, resp);
+            return resp;
+        }
+
+
+        [Route("test")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage testPost()
+        {
+            
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                
+            };
+            var resp = Request.CreateResponse(
+            HttpStatusCode.OK,
+            result
+            );
+            if (HttpContext.Current.Session["SK_login"] != null)
+            {
+                user x = HttpContext.Current.Session["SK_login"] as user;
+                Debug.WriteLine(x.id);
+                result = new
+                {
+                    status = 1,
+                    msg = "Success"+ x.id,
+
+                };
+                resp = Request.CreateResponse(
+           HttpStatusCode.OK,
+           result
+           );
+            }
+
+            return resp;
+        }
+     }
 }
