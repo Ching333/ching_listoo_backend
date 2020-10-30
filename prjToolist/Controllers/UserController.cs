@@ -219,12 +219,10 @@ namespace prjToolist.Controllers
             {
                 userlogin = int.Parse(Request.Headers.GetValues("session-id").FirstOrDefault());
             }
-
             var dataform = new
             {
                 id= listId
             };
-
             var result = new
             {
                 status = 0,
@@ -252,8 +250,6 @@ namespace prjToolist.Controllers
                
                 //listId = listId1[0];
                 //Debug.WriteLine(listId);
-
-
                 if (listId > 0) {
                     //回傳newlistId
                     Debug.WriteLine(listId);
@@ -285,42 +281,40 @@ namespace prjToolist.Controllers
                     }
                 }
             }
-          var resp = Request.CreateResponse(
-          HttpStatusCode.OK,
-          result
-          );
-          return resp;
+            var resp = Request.CreateResponse(
+            HttpStatusCode.OK,
+            result
+            );
+            return resp;
         }
 
-        [Route("list/{list_id:int}/add_place")]
+        [Route("add_list_places")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage list_add_place(int list_id, viewModelEditListPlace x)
+        public HttpResponseMessage list_add_place(viewModelEditListPlace x)
         {
             var result = new
             {
                 status = 0,
                 msg = $"fail",
-
             };
-            var hasList = db.placeLists.Where(p => p.id == list_id).Select(r => r).Any();
+            var hasList = db.placeLists.Where(p => p.id == x.list_id).Select(r => r).Any();
             if ( x.places.Length > 0 && hasList)
             {
                 foreach (int i in x.places)
                 {
                     placeRelation newListPlaces = new placeRelation();
                     var q = db.places.Where(p => p.id == i).Select(r => r).Any();
-                    var t = db.placeRelations.Where(p => p.place_id==i&&p.placeList_id== list_id).Select(r => r).Any();
+                    var t = db.placeRelations.Where(p => p.place_id==i&&p.placeList_id== x.list_id).Select(r => r).Any();
                     if (q&&(!t))
                     {
-                        newListPlaces.placeList_id = list_id;
+                        newListPlaces.placeList_id = x.list_id;
                         newListPlaces.place_id = i;
 
                         db.placeRelations.Add(newListPlaces);
                         db.SaveChanges();
                     }
                 }
-
                 result = new
                 {
                     status = 1,
@@ -330,16 +324,16 @@ namespace prjToolist.Controllers
             }
 
             var resp = Request.CreateResponse(
-          HttpStatusCode.OK,
-          result
-          );
+            HttpStatusCode.OK,
+            result
+            );
             return resp;
         }
 
-        [Route("list/{list_id:int}/remove_place")]
+        [Route("remove_list_places")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage list_remove_place(int list_id, viewModelEditListPlace x)
+        public HttpResponseMessage list_remove_place(viewModelEditListPlace x)
         {
             var result = new
             {
@@ -347,13 +341,13 @@ namespace prjToolist.Controllers
                 msg = $"fail",
 
             };
-            var hasList = db.placeLists.Where(p => p.id == list_id).Select(r => r).Any();
+            var hasList = db.placeLists.Where(p => p.id == x.list_id).Select(r => r).Any();
             if (x.places.Length > 0 && hasList)
             {
                 foreach (int i in x.places)
                 {
                     
-                    var t = db.placeRelations.Where(p => p.place_id == i && p.placeList_id == list_id).Select(r => r).FirstOrDefault();
+                    var t = db.placeRelations.Where(p => p.place_id == i && p.placeList_id == x.list_id).Select(r => r).FirstOrDefault();
                     if (t!=null)
                     {
                         db.placeRelations.Remove(t);
@@ -361,7 +355,6 @@ namespace prjToolist.Controllers
                         db.SaveChanges();
                     }
                 }
-
                 result = new
                 {
                     status = 1,
@@ -369,15 +362,49 @@ namespace prjToolist.Controllers
 
                 };
             }
-
-            var resp = Request.CreateResponse(
+          var resp = Request.CreateResponse(
           HttpStatusCode.OK,
           result
           );
             return resp;
         }
 
-        [Route("list/{list_id:int}/list_edit_info")]
+        [Route("list_edit_info/{list_id:int}")]
+        [HttpGet]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage list_edit_info(int list_id)
+        {
+            var result = new
+            {
+                status = 0,
+                msg = new viewModelEditListInfo(),
+
+            };
+            var list = db.placeLists.Where(p => p.id == list_id).Select(q => q).FirstOrDefault();
+            if (list != null)
+            {
+
+              viewModelEditListInfo x = new viewModelEditListInfo();
+
+                x.name = list.name;
+                x.description = list.description;
+                x.privacy = list.privacy;
+
+
+                result = new
+                {
+                    status = 1,
+                    msg = x,
+
+                };
+            }
+            var resp = Request.CreateResponse(
+         HttpStatusCode.OK,
+         result
+         );
+            return resp;
+        }
+        [Route("list_edit_info/{list_id:int}")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage list_edit_info(int list_id, viewModelEditListInfo x)
@@ -412,9 +439,7 @@ namespace prjToolist.Controllers
         }
 
 
-        //TODO  modify_place_tag
-
-        [Route("modify_place_tag")]
+        [Route("user/modify_place_tag")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage modify_place_tag([FromBody] tagString s)
@@ -433,9 +458,7 @@ namespace prjToolist.Controllers
 
         }
 
-        
 
-        
 
     }
 }  

@@ -26,7 +26,7 @@
           <Property Name="user_id" Type="int" Nullable="false" />
           <Property Name="name" Type="varchar" MaxLength="255" Nullable="false" />
           <Property Name="description" Type="varchar" MaxLength="255" />
-          <Property Name="privacy" Type="varchar" MaxLength="255" Nullable="false" />
+          <Property Name="privacy" Type="int" Nullable="false" />
           <Property Name="created" Type="datetime" Nullable="false" />
           <Property Name="updated" Type="datetime" />
           <Property Name="cover" Type="varbinary" MaxLength="1" />
@@ -286,7 +286,7 @@
           <Property Name="user_id" Type="Int32" Nullable="false" />
           <Property Name="name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="description" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
-          <Property Name="privacy" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+          <Property Name="privacy" Type="Int32" Nullable="false" />
           <Property Name="created" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="updated" Type="DateTime" Precision="3" />
           <Property Name="cover" Type="Binary" MaxLength="1" FixedLength="false" />
@@ -451,7 +451,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-      </Schema>
+        </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>

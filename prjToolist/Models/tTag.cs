@@ -18,6 +18,11 @@ namespace prjToolist.Models
         public string[] tag_str { get; set; }
 
     }
+    public class tagInfo
+    {
+        public string name { get; set; }
+        public int type { get; set; }
+    }
     public static class tagFactory {
         
         public static int[] tagStringToId(tagString s, FUENMLEntities db)

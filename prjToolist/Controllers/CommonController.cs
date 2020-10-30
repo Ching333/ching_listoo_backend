@@ -121,7 +121,7 @@ namespace prjToolist.Controllers
             public int userId { get; set; }
             public string name { get; set; }
             public string description { get; set; }
-            public string privacy { get; set; }
+            public int privacy { get; set; }
             public string createdTime { get; set; }
             public string updatedTime { get; set; }
             public string cover { get; set; }
@@ -138,11 +138,7 @@ namespace prjToolist.Controllers
             public string gmap_id { get; set; }
         }
 
-        public class tagInfo
-        {
-            public string name { get; set; }
-            public int type { get; set; }
-        }
+
 
         
         
