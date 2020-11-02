@@ -23,6 +23,24 @@ namespace prjToolist.Models
         public string name { get; set; }
         public int type { get; set; }
     }
+
+    public class viewModelTagChange
+    {
+        
+        public string gmap_id { get; set; }
+        public int[] add { get; set; }
+        public int[] remove { get; set; }
+        public string[] newTags { get; set; }
+    }
+
+    public class tTagRelaforTable
+    {
+        public int id { get; set; }
+        public string place_name { get; set; }
+        public string tag_name { get; set; }
+        public string user_name { get; set; }
+    }
+
     public static class tagFactory {
         
         public static int[] tagStringToId(tagString s, FUENMLEntities db)

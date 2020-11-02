@@ -17,6 +17,7 @@ using System.Web.SessionState;
 
 namespace prjToolist.Controllers
 {
+    [EnableCors("*", "*", "*")]
     // POST: api/Auth
     [RoutePrefix("auth")]
     public class AuthController : ApiController
@@ -25,7 +26,6 @@ namespace prjToolist.Controllers
         
         [Route("login")]
         [HttpPost]
-        [EnableCors("*", "*", "*")]
         public HttpResponseMessage loginPost([FromBody] memberLogin loginUser)
         {
             
@@ -72,7 +72,7 @@ namespace prjToolist.Controllers
 
         [Route("logout")]
         [HttpPost]
-        [EnableCors("*", "*", "*")]
+        //[EnableCors("*", "*", "*")]
         public HttpResponseMessage logoutPost() { 
         //{
         //    string sessionId = "";
@@ -127,7 +127,7 @@ namespace prjToolist.Controllers
 
         [Route("register")]
         [HttpPost]
-        [EnableCors("*", "*", "*")]
+        //[EnableCors("*", "*", "*")]
         public HttpResponseMessage createUser(createMember x)
         {
             var isnullormember = db.users.Where(p => p.email == x.email).FirstOrDefault();
@@ -157,7 +157,7 @@ namespace prjToolist.Controllers
         }
         [Route("test")]
         [HttpPost]
-        [EnableCors("*", "*", "*")]
+        //[EnableCors("*", "*", "*")]
         public HttpResponseMessage testSession()
         {
             var result = new

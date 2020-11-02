@@ -37,4 +37,17 @@ namespace prjToolist.Models
         public string description { get; set; }
         public int privacy { get; set; }
     }
+
+
+    public class queryPlaceList
+    {
+        public int id { get; set; }
+        public int user_id { get; set; }
+        public string user_name { get; set; }
+        public string listName { get; set; }
+        public string description { get; set; }
+        public int privacy { get; set; }
+        public string createdTime { get; set; }
+        public string updatedTime { get; set; }
+    }
 }

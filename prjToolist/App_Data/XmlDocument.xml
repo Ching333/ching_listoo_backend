@@ -487,12 +487,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:prjToolist.Controllers.ValuesController.Get">
-            <summary>
-                查詢USER
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:prjToolist.Properties.Resources">
             <summary>
               用於查詢當地語系化字串等的強類型資源類別。
