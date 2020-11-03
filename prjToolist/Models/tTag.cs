@@ -18,6 +18,11 @@ namespace prjToolist.Models
         public string[] tag_str { get; set; }
 
     }
+    public class tagFilter
+    {
+        public int[] filter { get; set; }
+    }
+
     public class tagInfo
     {
         public string name { get; set; }
@@ -39,6 +44,11 @@ namespace prjToolist.Models
         public string place_name { get; set; }
         public string tag_name { get; set; }
         public string user_name { get; set; }
+    }
+
+    public class viewModelSerachTag
+    {
+
     }
 
     public static class tagFactory {
@@ -70,8 +80,6 @@ namespace prjToolist.Models
                 }
 
             }
-
-
         }
         return tag_id.Distinct().ToArray();
     }
@@ -86,11 +94,11 @@ namespace prjToolist.Models
 
                     tag newtag = new tag();
                     newtag.name = item;
-                    newtag.type = 1;
+                    newtag.type = 2;
                     db.tags.Add(newtag);
-
+                    db.SaveChanges();
                 }
-                tag_id.Add(int.Parse(db.tags.Where(p => p.name == item).Select(q => q.id).ToString()));
+                tag_id.AddRange(db.tags.Where(p => p.name == item).Select(q => q.id).ToList());
 
 
 

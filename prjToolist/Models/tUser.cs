@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace prjToolist.Models
 {
@@ -39,9 +42,17 @@ namespace prjToolist.Models
     }
     public static class userFactory
     {
+        public static int userIsLoginSession(int userlogin)
+        {
+            if (HttpContext.Current.Session["SK_login"] != null)
+            {
+                user u = HttpContext.Current.Session["SK_login"] as user;
+                Debug.WriteLine("userid" + u.id);
+                userlogin = u.id;
 
-
-
+            };
+            return userlogin;
+        }
 
     }
     }

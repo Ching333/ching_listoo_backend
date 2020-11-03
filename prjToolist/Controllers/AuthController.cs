@@ -160,11 +160,14 @@ namespace prjToolist.Controllers
         //[EnableCors("*", "*", "*")]
         public HttpResponseMessage testSession()
         {
+            //int userlogin = 0;
             var result = new
             {
                 status = 0,
                 msg = "fail",
             };
+            //userlogin = userFactory.userIsLoginSession(userlogin);
+            //userlogin = (new UserController()).userIsLoginCookie(userlogin);
             if (HttpContext.Current.Session["SK_login"] != null)
             {
                 user x = HttpContext.Current.Session["SK_login"] as user;

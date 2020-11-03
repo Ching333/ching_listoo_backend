@@ -50,4 +50,17 @@ namespace prjToolist.Models
         public string createdTime { get; set; }
         public string updatedTime { get; set; }
     }
+
+
+    public class placeListInfo
+    {
+        public int id { get; set; }
+        public int userId { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public int privacy { get; set; }
+        public string createdTime { get; set; }
+        public string updatedTime { get; set; }
+        public string cover { get; set; }
+    }
 }

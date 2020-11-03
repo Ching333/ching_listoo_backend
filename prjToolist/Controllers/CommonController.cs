@@ -111,33 +111,9 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        public class tagFilter
-        {
-            public int[] filter { get; set; }
-        }
+       
 
-        public class placeListInfo
-        {
-            public int userId { get; set; }
-            public string name { get; set; }
-            public string description { get; set; }
-            public int privacy { get; set; }
-            public string createdTime { get; set; }
-            public string updatedTime { get; set; }
-            public string cover { get; set; }
-        }
-
-        public class placeInfo
-        {
-            public string name { get; set; }
-            public decimal longitude { get; set; }
-            public decimal latitude { get; set; }
-            public string phone { get; set; }
-            public string address { get; set; }
-            public string type { get; set; }
-            public string gmap_id { get; set; }
-        }
-
+       
 
 
         
