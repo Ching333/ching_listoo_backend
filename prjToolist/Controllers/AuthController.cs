@@ -17,7 +17,8 @@ using System.Web.SessionState;
 
 namespace prjToolist.Controllers
 {
-    [EnableCors("*", "*", "*")]
+    //[EnableCors(origins: "http://localhost:9527",headers:"*",methods:"*", SupportsCredentials = true)]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     // POST: api/Auth
     [RoutePrefix("auth")]
     public class AuthController : ApiController
@@ -47,7 +48,7 @@ namespace prjToolist.Controllers
             if (verifyAccount != null)
             {
                 HttpContext.Current.Session["SK_login"] = verifyAccount;
-
+                
                 resultUsername = new
                 {
                     username = verifyAccount.name

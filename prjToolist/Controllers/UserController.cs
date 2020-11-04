@@ -14,7 +14,7 @@ using static prjToolist.Controllers.CommonController;
 namespace prjToolist.Controllers
 {
     [RoutePrefix("user")]
-    [EnableCors("*", "*", "*")]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class UserController : ApiController
     {
         FUENMLEntities db = new FUENMLEntities();

@@ -47,7 +47,7 @@ namespace prjToolist.Models
             if (HttpContext.Current.Session["SK_login"] != null)
             {
                 user u = HttpContext.Current.Session["SK_login"] as user;
-                Debug.WriteLine("userid" + u.id);
+                //Debug.WriteLine("userid" + u.id);
                 userlogin = u.id;
 
             };
