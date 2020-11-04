@@ -355,6 +355,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\tMaps.cs" />
     <Compile Include="Models\tPlace.cs" />
     <Compile Include="Models\tPlaceList.cs" />
     <Compile Include="Models\tTag.cs" />

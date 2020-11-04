@@ -55,7 +55,8 @@ namespace prjToolist.Controllers
 
                 foreach (int i in tFilterid)
                 {
-                    intersectResult = searchTag(userlogin, ref intersectResult, i);
+                    intersectResult = tagFactory.searchTag(userlogin, ref intersectResult, i,db);
+                        
                 }
                 intersectResult = intersectResult.Distinct().ToList();
 
@@ -227,7 +228,7 @@ namespace prjToolist.Controllers
             {
                 foreach (int i in tFilterid)
                 {
-                    intersectResult = searchTag(userlogin, ref intersectResult, i);
+                    intersectResult = tagFactory.searchTag(userlogin, ref intersectResult, i,db);
 
                     //var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
                     //searchplacehastag = searchplacehastag.Distinct().ToList();
@@ -326,18 +327,18 @@ namespace prjToolist.Controllers
 
         }
 
-        public List<int> searchTag(int userlogin, ref List<int> intersectResult, int i)
-        {
+        //public List<int> searchTag(int userlogin, ref List<int> intersectResult, int i)
+        //{
 
-            var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
-            if (userlogin != 0)
-            {   
-                searchplacehastag = db.tagRelations.Where(P => P.tag_id == i && P.user_id == userlogin).Select(q => q.place_id).ToList();
-            }
-            //searchplacehastag = searchplacehastag.Distinct().ToList();
-            intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
-            return intersectResult;
-        }
+        //    var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
+        //    if (userlogin != 0)
+        //    {   
+        //        searchplacehastag = db.tagRelations.Where(P => P.tag_id == i && P.user_id == userlogin).Select(q => q.place_id).ToList();
+        //    }
+        //    //searchplacehastag = searchplacehastag.Distinct().ToList();
+        //    intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
+        //    return intersectResult;
+        //}
 
 
         [Route("test_union")]
