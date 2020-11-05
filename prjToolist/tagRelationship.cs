@@ -12,16 +12,11 @@ namespace prjToolist
     using System;
     using System.Collections.Generic;
     
-    public partial class place
+    public partial class tagRelationship
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public decimal longitude { get; set; }
-        public decimal latitude { get; set; }
-        public string phone { get; set; }
-        public string address { get; set; }
-        public string type { get; set; }
-        public string gmap_id { get; set; }
-        public byte[] photo { get; set; }
+        public int place_id { get; set; }
+        public int tag_id { get; set; }
+        public int user_id { get; set; }
+        public System.DateTime created { get; set; }
     }
 }

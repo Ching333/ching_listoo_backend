@@ -11,10 +11,23 @@ namespace prjToolist.Models
         public int user_id { get; set; }
         public string name { get; set; }
         public string description { get; set; }
-        public string privacy { get; set; }
-        public System.DateTime created { get; set; }
-        public Nullable<System.DateTime> updated { get; set; }
-        public byte[] cover { get; set; }
+        public int privacy { get; set; }
+        public string createdTime { get; set; }
+        public string updatedTime { get; set; }
+        public string coverImageURL { get; set; }
+    }
+
+    //  for common/get_recommend_lists 
+    public class placeListInfo
+    {
+        public int id { get; set; }
+        public int userId { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public int privacy { get; set; }
+        public string createdTime { get; set; }
+        public string updatedTime { get; set; }
+        public string cover { get; set; }
     }
 
     public class viewModelPlaceList
@@ -25,7 +38,7 @@ namespace prjToolist.Models
         //public string coverImageURL { get; set; }
         public int[] places { get; set; }
     }
-
+    
     public class viewModelEditListPlace
     {
         public int[] places { get; set; }
@@ -37,8 +50,11 @@ namespace prjToolist.Models
         public string description { get; set; }
         public int privacy { get; set; }
     }
-
-
+    public class viewModelGetListPlace
+    {
+        public int list_id { get; set; }
+        public int[] filter { get; set; }
+    }
     public class queryPlaceList
     {
         public int id { get; set; }
@@ -49,18 +65,5 @@ namespace prjToolist.Models
         public int privacy { get; set; }
         public string createdTime { get; set; }
         public string updatedTime { get; set; }
-    }
-
-
-    public class placeListInfo
-    {
-        public int id { get; set; }
-        public int userId { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public int privacy { get; set; }
-        public string createdTime { get; set; }
-        public string updatedTime { get; set; }
-        public string cover { get; set; }
     }
 }

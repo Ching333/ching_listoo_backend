@@ -16,7 +16,7 @@ namespace prjToolist.Models
         public Nullable<int> type { get; set; }
     }
 
-    public class placeInfo
+    public class tPlaceInfo
     {
         public string name { get; set; }
         public decimal longitude { get; set; }
@@ -27,11 +27,14 @@ namespace prjToolist.Models
         public string gmap_id { get; set; }
     }
 
-    public class viewModelgetuserplaceInfo
+    public class queryPlaceInfo
     {
+        public int id { get; set; }
         public string name { get; set; }
+        public decimal longitude { get; set; }
+        public decimal latitude { get; set; }
         public string phone { get; set; }
-        public string gmapid { get; set; }
-        public string cover { get; set; }
+        public string address { get; set; }
+        public string type { get; set; }
     }
 }

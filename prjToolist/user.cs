@@ -14,14 +14,6 @@ namespace prjToolist
     
     public partial class user
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public user()
-        {
-            this.placeLists = new HashSet<placeList>();
-            this.tagEvents = new HashSet<tagEvent>();
-            this.tagRelations = new HashSet<tagRelation>();
-        }
-    
         public int id { get; set; }
         public string name { get; set; }
         public string email { get; set; }
@@ -29,12 +21,5 @@ namespace prjToolist
         public int authority { get; set; }
         public Nullable<System.DateTime> updated { get; set; }
         public Nullable<System.DateTime> created { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<placeList> placeLists { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tagEvent> tagEvents { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tagRelation> tagRelations { get; set; }
     }
 }

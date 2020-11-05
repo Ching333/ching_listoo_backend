@@ -1,3 +1,7 @@
+After git clone
+---
+update entity framework
+
 MSSQL
 ---
 資料庫設定  

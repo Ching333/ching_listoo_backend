@@ -7,10 +7,14 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 using prjToolist.Models;
+using static prjToolist.Models.tagFactory;
+//using static prjToolist.Models.tagFactory;
+//using static prjToolist.Models.tTagRelation.tagFactory;
 
-namespace prjToolist.Controllers {
-
+namespace prjToolist.Controllers
+{
     [RoutePrefix("query")]
+    [JwtAuthActionFilter]
     public class ValuesController : ApiController
     {
         private readonly FUENMLEntities db = new FUENMLEntities();
@@ -27,7 +31,7 @@ namespace prjToolist.Controllers {
             {
                 var userListItem = db.users.AsEnumerable().FirstOrDefault(p => p.id == intList[i]);
                 queryUserList listItem = new queryUserList();
-                listItem.id = i + 1;
+                listItem.id = i+1;
                 listItem.name = userListItem.name;
                 listItem.email = userListItem.email;
                 listItem.authority = userListItem.authority;
@@ -50,7 +54,7 @@ namespace prjToolist.Controllers {
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage getTagList()
         {
-            var tag_List = db.tagRelations.ToList();
+            var tag_List = db.tagRelationships.ToList();
             List<tTagRelaforTable> tagsRelationList = new List<tTagRelaforTable>();
             for (int i = 0; i < tag_List.Count(); i++)
             {
@@ -88,7 +92,6 @@ namespace prjToolist.Controllers {
             foreach (int i in intList)
             {
                 var placeListItem = db.placeLists.FirstOrDefault(p => p.id == i);
-                //TODO會出錯
                 var userListItem = db.users.FirstOrDefault(u => u.id == placeListItem.user_id);
                 queryPlaceList listItem = new queryPlaceList();
                 listItem.id = placeListItem.id;
@@ -110,6 +113,35 @@ namespace prjToolist.Controllers {
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        [Route("get_place_info")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage getPlaceInfo()
+        {
+            var intList = db.places.Select(p => p.id).ToList();
+            List<queryPlaceInfo> placesInfoList = new List<queryPlaceInfo>();
+            foreach (int i in intList)
+            {
+                var placeInfoItem = db.places.FirstOrDefault(p => p.id == i);
+                queryPlaceInfo listItem = new queryPlaceInfo();
+                listItem.id = placeInfoItem.id;
+                listItem.name = placeInfoItem.name;
+                listItem.type = placeInfoItem.type;
+                listItem.phone = placeInfoItem.phone;
+                listItem.address = placeInfoItem.address;
+                listItem.longitude = placeInfoItem.longitude;
+                listItem.latitude = placeInfoItem.latitude;
+                placesInfoList.Add(listItem);
+            }
+            var result = new
+            {
+                data = placesInfoList,
+                total = placesInfoList.Count()
+            };
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
         [Route("update_placelist")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
@@ -119,6 +151,7 @@ namespace prjToolist.Controllers {
             var userListItem = db.users.FirstOrDefault(u => u.id == updateItem.user_id);
             placeListItem.name = updateItem.listName;
             placeListItem.description = updateItem.description;
+            placeListItem.privacy = updateItem.privacy;
             placeListItem.updated = DateTime.Now;
             //placeListItem.cover = updateItem.cover;
             userListItem.name = updateItem.user_name;
@@ -127,6 +160,36 @@ namespace prjToolist.Controllers {
             {
                 msg = "success"
             };
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [Route("update_tagRelation")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage updateTagRelation(updateTagRelation updateItem)
+        {
+            var placeListItem = db.placeLists.FirstOrDefault(p => p.name == updateItem.place_name);
+            var userListItem = db.users.FirstOrDefault(u => u.name == updateItem.user_name);
+            var tagListItem = db.tags.FirstOrDefault(t=>t.name == updateItem.tag_name);
+            var tagRelationItem = db.tagRelationships.Where(r => r.place_id == placeListItem.id
+                                                              && r.tag_id == tagListItem.id
+                                                              && r.user_id == userListItem.id)
+                                                           .FirstOrDefault();
+            var result = new
+            {
+                msg = "Error"
+            };
+            if (placeListItem != null && userListItem != null && tagListItem != null && tagRelationItem != null)
+            {
+                tagRelationItem.place_id = placeListItem.id;
+                tagRelationItem.tag_id = tagListItem.id;
+                tagRelationItem.user_id = userListItem.id;
+                db.SaveChanges();
+                result = new
+                {
+                    msg = ""
+                };
+            }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
@@ -207,170 +270,4 @@ namespace prjToolist.Controllers {
             public string Name { get; set; }
         }
     }
-
-
-
-
-
-
-    //[RoutePrefix("test")]
-    //public class ValuesController : ApiController {
-    //    private readonly FUENMLEntities db = new FUENMLEntities();
-    //    public int str { get; set; }
-
-
-    //    [Route("tag_relation")]
-    //    [HttpPost]
-    //    [EnableCors("*", "*", "*")]
-    //    public HttpResponseMessage tagRelation([FromBody] tTag tTag) {
-    //        var verifyAccount = db.users.Where(u => u.id == tTag.user_id).FirstOrDefault();
-    //        var verifyGlePlace = db.places.Where(p => p.gmap_id == tTag.gmap_id).FirstOrDefault();
-
-    //        var result = new {
-    //            status = 0,
-    //            msg = "fail"
-    //        };
-    //        if (verifyAccount != null)
-    //            if (verifyGlePlace != null) {
-    //                foreach (var i in tTag.tag_id) {
-    //                    var newTagRelation = new tagRelation();
-    //                    newTagRelation.place_id = verifyGlePlace.id;
-    //                    newTagRelation.user_id = verifyAccount.id;
-    //                    newTagRelation.tag_id = i;
-    //                    newTagRelation.created = DateTime.Now;
-    //                    db.tagRelations.Add(newTagRelation);
-    //                }
-
-    //                db.SaveChanges();
-    //                result = new {
-    //                    status = 1,
-    //                    msg = ""
-    //                };
-    //            }
-
-    //        return Request.CreateResponse(HttpStatusCode.OK, result);
-    //    }
-
-
-    //    [HttpPost]
-    //    [Route("listPost")]
-    //    [EnableCors("*", "*", "*")]
-    //    public IEnumerable<user> ttt() {
-    //        //public List<Student> Get() {
-    //        var api = from p in db.users
-    //            select p;
-    //        //user.Add*()
-    //        return api.ToList();
-    //    }
-
-
-    //    /// <summary>
-    //    ///     查詢USER
-    //    /// </summary>
-    //    /// <returns></returns>
-    //    // GET api/values
-    //    [HttpGet]
-    //    [Route("listGet")]
-    //    public IEnumerable<user> Get() {
-    //        //public List<Student> Get() {
-
-    //        var api = from p in db.users
-    //            select p;
-
-    //        //user.Add*()
-    //        return api.ToList();
-
-    //        /*
-    //        return new List<Student> {
-    //            new Student {
-    //                Id = 100,
-    //                Name = "小AAA明"
-    //            },
-    //            new Student {
-    //                Id = 101,
-    //                Name = "小華"
-    //            }
-    //        };
-    //        */
-    //    }
-
-    //    // GET api/values/5
-    //    public IEnumerable<user> Get(int id) {
-    //        var api = from p in db.users
-    //            where p.id == id
-    //            select p;
-    //        return api;
-    //    }
-
-    //    [HttpPost]
-    //    // POST api/values
-    //    public HttpResponseMessage Post([FromBody] string createUser) {
-    //        var controllerName = ControllerContext.RouteData.Values["controller"].ToString();
-    //        var jo = JObject.Parse(createUser);
-    //        var name = jo["name"].ToString();
-    //        var email = jo["email"].ToString();
-    //        var pwd = jo["password"].ToString();
-    //        var createdTime = jo["created"].ToString();
-    //        //string updatedTime = jo["updated"].ToString();
-    //        var authorityNew = jo["authority"].ToString();
-    //        var createMember = new user();
-    //        createMember.name = name;
-    //        createMember.email = email;
-    //        createMember.password = pwd;
-    //        createMember.created = DateTime.Parse(createdTime);
-    //        //createMember.updated = DateTime.Parse(updatedTime);
-    //        createMember.authority = int.Parse(authorityNew);
-    //        db.users.Add(createMember);
-    //        db.SaveChanges();
-    //        var result = new {
-    //            STATUS = true,
-    //            MSG = "成功"
-    //        };
-
-    //        return Request.CreateResponse(HttpStatusCode.OK, result);
-    //    }
-
-    //    // PUT api/values/5
-    //    public HttpResponseMessage Put(int id, [FromBody] string updateUser) {
-    //        var controllerName = ControllerContext.RouteData.Values["controller"].ToString();
-    //        var jo = JObject.Parse(updateUser);
-    //        //string memberId = jo["id"].ToString();
-    //        var name = jo["name"].ToString();
-    //        var email = jo["email"].ToString();
-    //        var pwd = jo["password"].ToString();
-    //        var updatedTime = jo["updated"].ToString();
-    //        var authorityNew = jo["authority"].ToString();
-    //        var updateMember = db.users.FirstOrDefault(p => p.id == id);
-
-    //        //user createMember = new user();
-    //        updateMember.name = name;
-    //        updateMember.email = email;
-    //        updateMember.password = pwd;
-    //        updateMember.updated = DateTime.Parse(updatedTime);
-    //        updateMember.authority = int.Parse(authorityNew);
-    //        db.SaveChanges();
-    //        var result = new {
-    //            STATUS = true,
-    //            MSG = "成功"
-    //        };
-
-    //        return Request.CreateResponse(HttpStatusCode.OK, result);
-    //    }
-
-    //    // DELETE api/values/5
-    //    public void Delete(int id) {
-    //    }
-
-    //    public class tTag {
-    //        public int user_id { get; set; }
-    //        public string gmap_id { get; set; }
-    //        public int[] tag_id { get; set; }
-    //    }
-
-
-    //    public class Student {
-    //        public int Id { get; set; }
-    //        public string Name { get; set; }
-    //    }
-    //}
 }

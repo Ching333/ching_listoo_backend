@@ -14,20 +14,8 @@ namespace prjToolist
     
     public partial class tag
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public tag()
-        {
-            this.tagEvents = new HashSet<tagEvent>();
-            this.tagRelations = new HashSet<tagRelation>();
-        }
-    
         public int id { get; set; }
         public string name { get; set; }
         public int type { get; set; }
-    
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tagEvent> tagEvents { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<tagRelation> tagRelations { get; set; }
     }
 }

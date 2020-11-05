@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Web;
-using System.Web.Http;
-using System.Web.Http.Cors;
 
 namespace prjToolist.Models
 {
@@ -18,11 +15,13 @@ namespace prjToolist.Models
         public Nullable<System.DateTime> updated { get; set; }
         public Nullable<System.DateTime> created { get; set; }
     }
+
     public class memberLogin
     {
         public string account { get; set; }
         public string password { get; set; }
     }
+
     public class createMember
     {
         public string name { get; set; }
@@ -40,6 +39,7 @@ namespace prjToolist.Models
         public string createdTime { get; set; }
         public string updatedTime { get; set; }
     }
+
     public static class userFactory
     {
         public static int userIsLoginSession(int userlogin)
@@ -47,12 +47,10 @@ namespace prjToolist.Models
             if (HttpContext.Current.Session["SK_login"] != null)
             {
                 user u = HttpContext.Current.Session["SK_login"] as user;
-                //Debug.WriteLine("userid" + u.id);
                 userlogin = u.id;
-
             };
             return userlogin;
         }
+    }
 
-    }
-    }
+}

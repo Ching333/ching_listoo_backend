@@ -10,7 +10,6 @@ using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
-using System.Web.SessionState;
 //using System.Web.Mvc;
 
 
@@ -19,17 +18,16 @@ namespace prjToolist.Controllers
 {
     //[EnableCors(origins: "http://localhost:9527",headers:"*",methods:"*", SupportsCredentials = true)]
     [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
-    // POST: api/Auth
     [RoutePrefix("auth")]
+    //[JwtAuthActionFilter]
     public class AuthController : ApiController
     {
         FUENMLEntities db = new FUENMLEntities();
-        
+
         [Route("login")]
         [HttpPost]
-        public HttpResponseMessage loginPost([FromBody] memberLogin loginUser)
+        public HttpResponseMessage loginPost(memberLogin loginUser)
         {
-            
             var verifyAccount = db.users.FirstOrDefault(P => P.email == loginUser.account && P.password == loginUser.password);
             //var cookie = new CookieHeaderValue("session-id", verifyAccount.id.ToString());
             //cookie.Expires = DateTimeOffset.Now.AddDays(1);
@@ -48,7 +46,7 @@ namespace prjToolist.Controllers
             if (verifyAccount != null)
             {
                 HttpContext.Current.Session["SK_login"] = verifyAccount;
-                
+
                 resultUsername = new
                 {
                     username = verifyAccount.name
@@ -63,37 +61,31 @@ namespace prjToolist.Controllers
                 //resp.RequestMessage.Content = result;
                 //var reqResult = Request.CreateResponse(HttpStatusCode.OK, result);
             }
-            //return Request.CreateResponse(HttpStatusCode.OK, resp);
             var resp = Request.CreateResponse(
-           HttpStatusCode.OK,
-           result
-           );
+               HttpStatusCode.OK,
+               result
+               );
             return resp;
         }
 
         [Route("logout")]
         [HttpPost]
-        //[EnableCors("*", "*", "*")]
-        public HttpResponseMessage logoutPost() { 
-        //{
-        //    string sessionId = "";
-          
-        //    CookieHeaderValue cookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
-        //    if (cookie != null)
-        //    {
-                
-        //        sessionId = cookie["session-id"].Value;
-        //    }
-           
+        public HttpResponseMessage logoutPost()
+        {
+            //{
+            //    string sessionId = "";
+            //    CookieHeaderValue cookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
+            //    if (cookie != null)
+            //    {
+            //        sessionId = cookie["session-id"].Value;
+            //    }
             //============================================================
-
             //var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
             var result = new
             {
                 status = 0,
                 msg = "fail"
             };
-            
             //if (currentCookie != null)
             //{
             //    var cookie = new CookieHeaderValue("session-id", "")
@@ -104,7 +96,7 @@ namespace prjToolist.Controllers
             //    };
             //    resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
             //}
-            if(HttpContext.Current.Session["SK_login"] != null)
+            if (HttpContext.Current.Session["SK_login"] != null)
             {
                 HttpContext.Current.Session["SK_login"] = null;
                 result = new
@@ -113,6 +105,7 @@ namespace prjToolist.Controllers
                     msg = "logout success"
                 };
             }
+
             var resp = Request.CreateResponse(
                 HttpStatusCode.OK,
                 result
@@ -128,10 +121,9 @@ namespace prjToolist.Controllers
 
         [Route("register")]
         [HttpPost]
-        //[EnableCors("*", "*", "*")]
-        public HttpResponseMessage createUser(createMember x)
+        public HttpResponseMessage createUser(createMember createMemberModel)
         {
-            var isnullormember = db.users.Where(p => p.email == x.email).FirstOrDefault();
+            var isnullormember = db.users.Where(p => p.email == createMemberModel.email).FirstOrDefault();
             var result = new
             {
                 status = 0,
@@ -140,9 +132,9 @@ namespace prjToolist.Controllers
             if (isnullormember == null)
             {
                 user newmember = new user();
-                newmember.name =x.name;
-                newmember.password = x.password;
-                newmember.email = x.email;
+                newmember.name = createMemberModel.name;
+                newmember.password = createMemberModel.password;
+                newmember.email = createMemberModel.email;
                 newmember.created = DateTime.Now;
                 newmember.updated = DateTime.Now;
                 newmember.authority = 1;
@@ -151,14 +143,14 @@ namespace prjToolist.Controllers
                 result = new
                 {
                     status = 1,
-                    msg = "success register",
+                    msg = "Register success",
                 };
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
+        
         [Route("test")]
         [HttpPost]
-        //[EnableCors("*", "*", "*")]
         public HttpResponseMessage testSession()
         {
             //int userlogin = 0;
@@ -176,7 +168,7 @@ namespace prjToolist.Controllers
                 result = new
                 {
                     status = 1,
-                    msg = "Success"+" "+ x.id,
+                    msg = "Success" + " " + x.id,
                 };
             }
             var resp = Request.CreateResponse(
@@ -185,5 +177,5 @@ namespace prjToolist.Controllers
             );
             return resp;
         }
-     }
+    }
 }

@@ -55,6 +55,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="jose-jwt, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\jose-jwt.2.6.0\lib\net461\jose-jwt.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.Authentication.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
     </Reference>
@@ -335,6 +338,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MapController.cs" />
     <Compile Include="Controllers\PlaceController.cs" />
+    <Compile Include="Controllers\TokenController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="FUENModel.Context.cs">
@@ -355,6 +359,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\JwtAuthActionFilter.cs" />
     <Compile Include="Models\tMaps.cs" />
     <Compile Include="Models\tPlace.cs" />
     <Compile Include="Models\tPlaceList.cs" />
@@ -366,7 +371,7 @@
     <Compile Include="placeList.cs">
       <DependentUpon>FUENModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="placeRelation.cs">
+    <Compile Include="placeRelationship.cs">
       <DependentUpon>FUENModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -386,7 +391,7 @@
     <Compile Include="tagEvent.cs">
       <DependentUpon>FUENModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="tagRelation.cs">
+    <Compile Include="tagRelationship.cs">
       <DependentUpon>FUENModel.tt</DependentUpon>
     </Compile>
     <Compile Include="user.cs">

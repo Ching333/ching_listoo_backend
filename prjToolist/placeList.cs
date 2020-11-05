@@ -14,12 +14,6 @@ namespace prjToolist
     
     public partial class placeList
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public placeList()
-        {
-            this.placeRelations = new HashSet<placeRelation>();
-        }
-    
         public int id { get; set; }
         public int user_id { get; set; }
         public string name { get; set; }
@@ -28,9 +22,5 @@ namespace prjToolist
         public System.DateTime created { get; set; }
         public Nullable<System.DateTime> updated { get; set; }
         public byte[] cover { get; set; }
-    
-        public virtual user user { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<placeRelation> placeRelations { get; set; }
     }
 }

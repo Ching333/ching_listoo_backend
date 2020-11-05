@@ -15,12 +15,9 @@ namespace prjToolist
     public partial class tagEvent
     {
         public int id { get; set; }
-        public int user_id { get; set; }
-        public Nullable<int> tag_id { get; set; }
-        public Nullable<int> @event { get; set; }
         public System.DateTime created { get; set; }
-    
-        public virtual tag tag { get; set; }
-        public virtual user user { get; set; }
+        public int user_id { get; set; }
+        public int tag_id { get; set; }
+        public int tagEvent1 { get; set; }
     }
 }
