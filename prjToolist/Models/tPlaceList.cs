@@ -55,6 +55,12 @@ namespace prjToolist.Models
         public int list_id { get; set; }
         public int[] filter { get; set; }
     }
+    public class viewModelSaveListCover
+    {
+        public int list_id { get; set; }
+        public string coverUrl { get; set; }
+    }
+    
     public class queryPlaceList
     {
         public int id { get; set; }

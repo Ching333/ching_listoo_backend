@@ -39,6 +39,7 @@ namespace prjToolist.Models
 
     public class placeInfo
     {
+        public int id { get; set; }
         public string name { get; set; }
         public decimal longitude { get; set; }
         public decimal latitude { get; set; }

@@ -1,11 +1,14 @@
-﻿using prjToolist.Models;
+﻿
+using prjToolist.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -14,6 +17,7 @@ using static prjToolist.Models.tagFactory;
 //using static prjToolist.Models.tagFactory;
 using static prjToolist.Models.tTagRelation;
 //using static prjToolist.Models.tTagRelation.tagFactory;
+
 
 namespace prjToolist.Controllers
 {
@@ -544,6 +548,74 @@ namespace prjToolist.Controllers
             return resp;
         }
 
+        [Route("search_user_places")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage search_user_places(queryPocketPlaceInfo vm_pocketPlaceInfo)
+        {
+            int userlogin = 0;
+            List<int> placeInDBResult = new List<int>();
+            List<int> intersectResult = new List<int>();
+            List<placeInfo> resultPlaceInfo = new List<placeInfo>();
+            var dataForm = new
+            {
+                places = resultPlaceInfo
+            };
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data= dataForm
+            };
+            placeInDBResult = db.places.Select(p => p.id).ToList();
+            userlogin = userFactory.userIsLoginSession(userlogin);
+            var hasList = db.placeLists.Where(p => p.id == vm_pocketPlaceInfo.list_id).Select(r => r).Any();
+            if (hasList&& userlogin!=0)
+            {
+                
+                if (vm_pocketPlaceInfo.text != "") { 
+                   vm_pocketPlaceInfo.text = vm_pocketPlaceInfo.text.Trim();
+                }
+                intersectResult = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.place_id).ToList();
+                intersectResult = intersectResult.Distinct().ToList();
+                if (intersectResult.Count > 0)
+                {
+                    foreach (int i in intersectResult)
+                    {
+                        var pocketPlace= db.places.Where(p => p.id == i && p.name.Contains(vm_pocketPlaceInfo.text)).Select(q => q).FirstOrDefault();
+                        if (vm_pocketPlaceInfo.text != "") {
+                            pocketPlace = db.places.Where(p => p.id == i && p.name.Contains(vm_pocketPlaceInfo.text)).Select(q => q).FirstOrDefault();
+                        }
+                        
+                        if (pocketPlace != null)
+                        {
+                            placeInfo placeinfo = new placeInfo();
+                            placeinfo.id = pocketPlace.id;
+                            placeinfo.gmap_id = pocketPlace.gmap_id;
+                            placeinfo.name = pocketPlace.name;
+                            placeinfo.phone = pocketPlace.phone;
+                            resultPlaceInfo.Add(placeinfo);
+                        }
+                    }
+                    dataForm = new
+                    {
+                        places = resultPlaceInfo
+                    };
+                    result = new
+                    {
+                        status = 1,
+                        msg = "success",
+                        data = dataForm
+                    };
+                }
+            }
+            
+            var resp = Request.CreateResponse(
+            HttpStatusCode.OK,
+            result
+            );
+            return resp;
+        }
 
         //TODO URL待確認是否有要get
         [Route("list_edit_info/{list_id:int}")]
@@ -641,6 +713,9 @@ namespace prjToolist.Controllers
                 {
                     foreach (var i in x.add)
                     {
+                        var hastag = db.tags.Where(p => p.id == i).Any();
+                        var placehastag = db.tagRelationships.Where(p => p.tag_id == i && p.place_id == place.id).Any();
+                        if (hastag&&!placehastag) { 
                         tagRelationship t = new tagRelationship();
                         t.tag_id = i;
                         t.place_id = place.id;
@@ -655,14 +730,16 @@ namespace prjToolist.Controllers
                         newEvent.created = DateTime.Now;
                         db.tagEvents.Add(newEvent);
                         db.SaveChanges();
+                        }
                     }
                 }
                 if (x.remove.Length > 0)
                 {
                     foreach (var j in x.remove)
                     {
+                        var hastag = db.tags.Where(p => p.id == j).Any();
                         var d = db.tagRelationships.Where(p => p.place_id == place.id && p.tag_id == j).Select(q => q).FirstOrDefault();
-                        if (d != null)
+                        if (hastag&&d != null)
                         {
                             db.tagRelationships.Remove(d);
                             db.SaveChanges();
@@ -682,6 +759,7 @@ namespace prjToolist.Controllers
                 if (x.newTags.Length > 0)
                 {
                     int[] newTagId = tagFactory.checktagString(new tagString { tag_str = x.newTags }, db);
+                    if (newTagId.Length > 0) { 
                     foreach (var i in newTagId)
                     {
                         tagRelationship t = new tagRelationship();
@@ -691,6 +769,7 @@ namespace prjToolist.Controllers
                         t.created = DateTime.Now;
                         db.tagRelationships.Add(t);
                         db.SaveChanges();
+                    }
                     }
                 }
 
@@ -707,7 +786,97 @@ namespace prjToolist.Controllers
             return resp;
         }
 
-        private static int userIsLoginSession(int userlogin)
+        [Route("modify_list_photo")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage modify_list_photo()
+        {
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+            };
+            
+            var httpRequest = HttpContext.Current.Request;
+            try
+            {
+                if (httpRequest.Files.Count > 0)
+                {
+                    var docfiles = new List<string>();
+                    foreach (string file in httpRequest.Files)
+                    {
+                        var postedFile = httpRequest.Files[file];
+                        FileInfo uploadfile = new FileInfo(postedFile.FileName);
+                        string photoName = Guid.NewGuid().ToString() + uploadfile.Extension;
+                        var filePath = HttpContext.Current.Server.MapPath("~/Storage/upload/" + photoName);
+                        postedFile.SaveAs(filePath);
+                        docfiles.Add(filePath);
+                    }
+                    result = new
+                    {
+                        status = 1,
+                        msg = "上傳成功",
+                    };
+                }
+            }catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+                result = new
+                {
+                    status = 0,
+                    msg = "檔案大小超過限制",
+                };
+            }
+            
+            var resp = Request.CreateResponse(
+          HttpStatusCode.OK,
+          result
+          );
+            return resp;
+        }
+
+        [Route("save_list_photo")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage save_list_photo(viewModelSaveListCover vm_saveListListCover)
+        {
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+            };
+            var list = db.placeLists.Where(p => p.id == vm_saveListListCover.list_id).Select(q => q).FirstOrDefault();
+            if (list!=null&& vm_saveListListCover.coverUrl != "")
+            {
+                try
+                {
+                    //list.cover = byte[];
+                    db.SaveChanges();
+                }catch(Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    result = new
+                    {
+                        status = 0,
+                        msg = "修改圖片失敗",
+                    };
+                }
+
+                result = new
+                {
+                    status = 1,
+                    msg = "修改圖片成功",
+                };
+            }
+            var resp = Request.CreateResponse(
+            HttpStatusCode.OK,
+            result
+            );
+            return resp;
+
+        }
+
+            private static int userIsLoginSession(int userlogin)
         {
             if (HttpContext.Current.Session["SK_login"] != null)
             {

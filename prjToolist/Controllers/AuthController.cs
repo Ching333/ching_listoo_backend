@@ -130,7 +130,7 @@ namespace prjToolist.Controllers
                 msg = "fail,email exist",
             };
             if (isnullormember == null)
-            {
+            {   if(createMemberModel.name!=null&& createMemberModel.password != null) { 
                 user newmember = new user();
                 newmember.name = createMemberModel.name;
                 newmember.password = createMemberModel.password;
@@ -145,6 +145,14 @@ namespace prjToolist.Controllers
                     status = 1,
                     msg = "Register success",
                 };
+                }
+                result = new
+                {
+                    status = 1,
+                    msg = "註冊會員資料不完整",
+                };
+
+
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }

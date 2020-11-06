@@ -14,6 +14,7 @@ namespace prjToolist.Controllers
 {
     [RoutePrefix("common")]
     //[JwtAuthActionFilter]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class CommonController : ApiController
     {
         FUENMLEntities db = new FUENMLEntities();
