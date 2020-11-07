@@ -436,6 +436,7 @@ namespace prjToolist.Controllers
                 data = dataform
             };
             userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userIsLoginCookie(userlogin);
             if (userlogin != 0)
             {
                 placeList newList = new placeList();
@@ -598,6 +599,7 @@ namespace prjToolist.Controllers
             };
             placeInDBResult = db.places.Select(p => p.id).ToList();
             userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userIsLoginCookie(userlogin);
             var hasList = db.placeLists.Where(p => p.id == vm_pocketPlaceInfo.list_id).Select(r => r).Any();
             if (hasList&& userlogin!=0)
             {
@@ -733,6 +735,7 @@ namespace prjToolist.Controllers
                 msg = "fail",
             };
             userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userIsLoginCookie(userlogin);
             var place = db.places.Where(p => p.id == vm_tagChange.place_id).Select(q => q).FirstOrDefault();
             if (place != null && userlogin != 0)
             {
@@ -928,6 +931,7 @@ namespace prjToolist.Controllers
             List<tTag> tags = new List<tTag>();
             List<int> tagid = new List<int>();
             userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userIsLoginCookie(userlogin);
             var result = new
             {
                 status = 0,
@@ -1005,6 +1009,7 @@ namespace prjToolist.Controllers
                 msg = "invalid event type",
             };
             userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userIsLoginCookie(userlogin);
             if (tTagEvent != null)
             {
                 if (tTagEvent.action == 1 || tTagEvent.action == 2)
@@ -1029,12 +1034,12 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        private int userIsLoginCookie(int userlogin)
+        public int userIsLoginCookie(int userlogin)
         {
-            var currentCookie = Request.Headers.GetCookies("session-id").FirstOrDefault();
-            if (Request.Headers.Contains("session-id"))
+            var currentCookie = Request.Headers.GetCookies("session_id").FirstOrDefault();
+            if (Request.Headers.Contains("session_id"))
             {
-                userlogin = int.Parse(Request.Headers.GetValues("session-id").FirstOrDefault());
+                userlogin = int.Parse(Request.Headers.GetValues("session_id").FirstOrDefault());
             }
 
             return userlogin;

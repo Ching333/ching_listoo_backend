@@ -99,7 +99,9 @@ namespace prjToolist.Controllers
             //    };
             //    resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
             //}
-            if (HttpContext.Current.Session["SK_login"] != null)
+            int userlogin = 0;
+            userlogin = (new UserController()).userIsLoginCookie(userlogin);
+            if (HttpContext.Current.Session["SK_login"] != null|| userlogin!=0)
             {
                 HttpContext.Current.Session["SK_login"] = null;
                 result = new
