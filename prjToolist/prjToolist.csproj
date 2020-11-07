@@ -365,6 +365,7 @@
     <Compile Include="Models\tPlaceList.cs" />
     <Compile Include="Models\tTag.cs" />
     <Compile Include="Models\tUser.cs" />
+    <Compile Include="Models\tValues.cs" />
     <Compile Include="place.cs">
       <DependentUpon>FUENModel.tt</DependentUpon>
     </Compile>

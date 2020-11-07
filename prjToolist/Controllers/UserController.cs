@@ -41,11 +41,11 @@ namespace prjToolist.Controllers
             List<placeInfo> resultPlaceInfo = new List<placeInfo>();
             var dataForm = new
             {
-                alltags = tagsList,
-                tags = resultTagInfo,
-                placesId = intersectResult,
+                //alltags = tagsList,
+                user_tags = resultTagInfo,
+                //placesId = intersectResult,
                 places = resultPlaceInfo,
-                systemtags = systemTagResult
+                system_tags = systemTagResult
             };
             var result = new
             {
@@ -53,7 +53,9 @@ namespace prjToolist.Controllers
                 msg = "fail",
                 data = dataForm
             };
-            userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userFactory.userIsLoginSession(userlogin);//原本用Session
+            userlogin = userIsLoginCookie(userlogin);//改用Header
+            //if (userlogin == 0) { userlogin = 1; }
             if (userlogin != 0)
             {
                 intersectResult = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.place_id).ToList();
@@ -69,11 +71,11 @@ namespace prjToolist.Controllers
 
                 dataForm = new
                 {
-                    alltags = tagsList,
-                    tags = resultTagInfo,
-                    placesId = intersectResult,
+                    //alltags = tagsList,
+                    user_tags = resultTagInfo,
+                    //placesId = intersectResult,
                     places = resultPlaceInfo,
-                    systemtags = systemTagResult
+                    system_tags = systemTagResult
                 };
 
                 result = new
@@ -94,23 +96,26 @@ namespace prjToolist.Controllers
                         if (placeItem.type != null) { systemTagResult.Add(placeItem.type); }
 
                         placeInfo rPlace = new placeInfo();
+                        rPlace.id= placeItem.id;
+                        rPlace.gmap_id = placeItem.gmap_id;
                         rPlace.name = placeItem.name;
                         rPlace.phone = placeItem.phone;
                         rPlace.address = placeItem.address;
                         rPlace.type = placeItem.type;
                         rPlace.longitude = placeItem.longitude;
                         rPlace.latitude = placeItem.latitude;
+                        rPlace.photo_url = "";
                         resultPlaceInfo.Add(rPlace);
                     }
                     tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == i && p.user_id == userlogin).Select(q => q.tag_id).ToList());
 
                     dataForm = new
                     {
-                        alltags = tagsList,
-                        tags = resultTagInfo,
-                        placesId = intersectResult,
+                        //alltags = tagsList,
+                        user_tags = resultTagInfo,
+                        //placesId = intersectResult,
                         places = resultPlaceInfo,
-                        systemtags = systemTagResult
+                        system_tags = systemTagResult
                     };
 
                     result = new
@@ -139,11 +144,11 @@ namespace prjToolist.Controllers
                     }
                     dataForm = new
                     {
-                        alltags = tagsList,
-                        tags = resultTagInfo,
-                        placesId = intersectResult,
+                        //alltags = tagsList,
+                        user_tags = resultTagInfo,
+                        //placesId = intersectResult,
                         places = resultPlaceInfo,
-                        systemtags = systemTagResult
+                        system_tags = systemTagResult
                     };
                     result = new
                     {
@@ -170,23 +175,27 @@ namespace prjToolist.Controllers
             //int[] tFilterid = tagFactory.tagStringToId(s, db);
             int[] tFilterid = tfilter.filter;
             List<int> userList = new List<int>();
+            List<string> systemTagResult = new List<string>();
             List<int> placesList = new List<int>();
             List<int> tagsList = new List<int>();
             List<int> intersectResult = new List<int>();
+            List<tTag> resultTagInfo = new List<tTag>();
             List<placeListInfo> infoList = new List<placeListInfo>();
             //if (HttpContext.Current.Session["SK_login"] != null)
             //{
             //    user x = HttpContext.Current.Session["SK_login"] as user;
             //    Debug.WriteLine("userid"+x.id);
             //    userlogin = x.id;
-
             //};
-            userlogin = userFactory.userIsLoginSession(userlogin);
+            userlogin = userFactory.userIsLoginSession(userlogin);//原本用Session
+            userlogin =userIsLoginCookie(userlogin);//測試用Header找user id
+            //if (userlogin == 0) { userlogin = 1; }
             var dataForm = new
             {
-                list = infoList,
-                tags = tagsList,
-                places = intersectResult
+                lists = infoList,
+                user_tags = resultTagInfo,
+                places = intersectResult,
+                system_tags= systemTagResult
             };
 
             var result = new
@@ -226,9 +235,10 @@ namespace prjToolist.Controllers
 
                 dataForm = new
                 {
-                    list = infoList,
-                    tags = tagsList,
-                    places = intersectResult
+                    lists = infoList,
+                    user_tags = resultTagInfo,
+                    places = intersectResult,
+                    system_tags = systemTagResult
                 };
 
                 result = new
@@ -257,9 +267,10 @@ namespace prjToolist.Controllers
 
                 dataForm = new
                 {
-                    list = infoList,
-                    tags = tagsList,
-                    places = intersectResult//地點編號
+                    lists = infoList,
+                    user_tags = resultTagInfo,
+                    places = intersectResult,//地點編號
+                system_tags = systemTagResult
                 };
 
                 result = new
@@ -275,11 +286,27 @@ namespace prjToolist.Controllers
                 //Debug.WriteLine("有搜尋到交集地點或清單中有地點");
                 foreach (int j in intersectResult)
                 {
+                    var placeItem = db.places.Where(p => p.id == j).FirstOrDefault();
+                    if (placeItem.type != null) { systemTagResult.Add(placeItem.type); }
                     //篩選出這些地點的所有tag
                     tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == j).Select(q => q.tag_id).ToList());
                 }
                 tagsList = tagsList.Distinct().ToList();//最終tag結果
-
+                systemTagResult= systemTagResult.Distinct().ToList();
+                if (tagsList.Count > 0) { 
+                foreach (int i in tagsList)
+                {
+                    var rtag = db.tags.Where(p => p.id == i && p.type == 2).Select(q => q).FirstOrDefault();
+                    if (rtag != null)
+                    {
+                        tTag t = new tTag();
+                        t.id = rtag.id;
+                        t.name = rtag.name;
+                        //t.type = rtag.type;
+                        resultTagInfo.Add(t);
+                    }
+                }
+                }
                 if (tFilterid != null && tFilterid.Length > 0)
                 {
                     //若篩選出有共同標籤地點就更新清單  不然使使用原本清單
@@ -293,9 +320,10 @@ namespace prjToolist.Controllers
 
                 dataForm = new
                 {
-                    list = infoList,
-                    tags = tagsList,
-                    places = intersectResult//地點編號
+                    lists = infoList,
+                    user_tags = resultTagInfo,
+                    places = intersectResult,//地點編號
+                    system_tags = systemTagResult
                 };
 
                 result = new
@@ -330,9 +358,10 @@ namespace prjToolist.Controllers
 
                 dataForm = new
                 {
-                    list = infoList,
-                    tags = tagsList,
-                    places = intersectResult//地點編號
+                    lists = infoList,
+                    user_tags = resultTagInfo,
+                    places = intersectResult,//地點編號
+                    system_tags = systemTagResult
                 };
 
                 result = new
@@ -439,7 +468,7 @@ namespace prjToolist.Controllers
                     result = new
                     {
                         status = 1,
-                        msg = "",
+                        msg = "success create new list",
                         data = dataform
                     };
                 }
@@ -594,6 +623,9 @@ namespace prjToolist.Controllers
                             placeinfo.gmap_id = pocketPlace.gmap_id;
                             placeinfo.name = pocketPlace.name;
                             placeinfo.phone = pocketPlace.phone;
+                            placeinfo.address = pocketPlace.address;
+                            placeinfo.type = pocketPlace.type;
+                            placeinfo.photo_url = "";
                             resultPlaceInfo.Add(placeinfo);
                         }
                     }
@@ -617,7 +649,7 @@ namespace prjToolist.Controllers
             return resp;
         }
 
-        //TODO URL待確認是否有要get
+        //TODO URL待確認是否有要get 改到user/
         [Route("list_edit_info/{list_id:int}")]
         [HttpGet]
         [EnableCors("*", "*", "*")]
@@ -654,10 +686,10 @@ namespace prjToolist.Controllers
 
 
         //TODO URL待確認是否有list_id 或包在BOdy
-        [Route("list_edit_info/{list_id:int}")]
+        [Route("edit_list")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage list_edit_info(int list_id, viewModelEditListInfo x)
+        public HttpResponseMessage edit_list(viewModelEditListInfo vm_editlist)
         {
             var result = new
             {
@@ -665,13 +697,13 @@ namespace prjToolist.Controllers
                 msg = $"fail",
 
             };
-            var list = db.placeLists.Where(p => p.id == list_id).Select(q => q).FirstOrDefault();
+            var list = db.placeLists.Where(p => p.id == vm_editlist.list_id).Select(q => q).FirstOrDefault();
 
-            if (list != null)
+            if (list != null&& vm_editlist.name!=null&& vm_editlist.description!=null&& vm_editlist.privacy!=0)
             {
-                list.name = x.name;
-                list.description = x.description;
-                list.privacy = x.privacy;
+                list.name = vm_editlist.name;
+                list.description = vm_editlist.description;
+                list.privacy = vm_editlist.privacy;
                 list.updated = DateTime.Now;
                 db.SaveChanges();
                 result = new
@@ -692,7 +724,7 @@ namespace prjToolist.Controllers
         [Route("modify_place_tag")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage modify_place_tag(viewModelTagChange x)
+        public HttpResponseMessage modify_place_tag(viewModelTagChange vm_tagChange)
         {
             int userlogin = 0;
             var result = new
@@ -701,7 +733,7 @@ namespace prjToolist.Controllers
                 msg = "fail",
             };
             userlogin = userFactory.userIsLoginSession(userlogin);
-            var place = db.places.Where(p => p.gmap_id == x.gmap_id).Select(q => q).FirstOrDefault();
+            var place = db.places.Where(p => p.id == vm_tagChange.place_id).Select(q => q).FirstOrDefault();
             if (place != null && userlogin != 0)
             {
                 //若資料庫沒有此地點 要新增一個地點 並回傳新增的placeid
@@ -709,9 +741,9 @@ namespace prjToolist.Controllers
                 //    place newPlace = new place();
                 //    newPlace.gmap_id = x.gmap_id;
                 //}
-                if (x.add.Length > 0)
+                if (vm_tagChange.add.Length > 0)
                 {
-                    foreach (var i in x.add)
+                    foreach (var i in vm_tagChange.add)
                     {
                         var hastag = db.tags.Where(p => p.id == i).Any();
                         var placehastag = db.tagRelationships.Where(p => p.tag_id == i && p.place_id == place.id).Any();
@@ -733,9 +765,9 @@ namespace prjToolist.Controllers
                         }
                     }
                 }
-                if (x.remove.Length > 0)
+                if (vm_tagChange.remove.Length > 0)
                 {
-                    foreach (var j in x.remove)
+                    foreach (var j in vm_tagChange.remove)
                     {
                         var hastag = db.tags.Where(p => p.id == j).Any();
                         var d = db.tagRelationships.Where(p => p.place_id == place.id && p.tag_id == j).Select(q => q).FirstOrDefault();
@@ -756,9 +788,9 @@ namespace prjToolist.Controllers
                     }
                 }
 
-                if (x.newTags.Length > 0)
+                if (vm_tagChange.newTags.Length > 0)
                 {
-                    int[] newTagId = tagFactory.checktagString(new tagString { tag_str = x.newTags }, db);
+                    int[] newTagId = tagFactory.checktagString(new tagString { tag_str = vm_tagChange.newTags }, db);
                     if (newTagId.Length > 0) { 
                     foreach (var i in newTagId)
                     {
@@ -776,7 +808,7 @@ namespace prjToolist.Controllers
                 result = new
                 {
                     status = 1,
-                    msg = "",
+                    msg = "OK",
                 };
             }
             var resp = Request.CreateResponse(
@@ -786,10 +818,10 @@ namespace prjToolist.Controllers
             return resp;
         }
 
-        [Route("modify_list_photo")]
+        [Route("save_list_photo")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage modify_list_photo()
+        public HttpResponseMessage save_list_photo()
         {
             var result = new
             {
@@ -835,18 +867,18 @@ namespace prjToolist.Controllers
             return resp;
         }
 
-        [Route("save_list_photo")]
+        [Route("set_list_photo")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage save_list_photo(viewModelSaveListCover vm_saveListListCover)
+        public HttpResponseMessage set_list_photo(viewModelSetListCover vm_setListCover)
         {
             var result = new
             {
                 status = 0,
                 msg = "fail",
             };
-            var list = db.placeLists.Where(p => p.id == vm_saveListListCover.list_id).Select(q => q).FirstOrDefault();
-            if (list!=null&& vm_saveListListCover.coverUrl != "")
+            var list = db.placeLists.Where(p => p.id == vm_setListCover.list_id).Select(q => q).FirstOrDefault();
+            if (list!=null&& vm_setListCover.cover_image_url != "")
             {
                 try
                 {
@@ -885,6 +917,116 @@ namespace prjToolist.Controllers
                 userlogin = u.id;
             };
             return userlogin;
+        }
+
+        [Route("search_tag")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage searchTag(viewModelSerachTag searchText)
+        {
+            int userlogin = 0;
+            List<tTag> tags = new List<tTag>();
+            List<int> tagid = new List<int>();
+            userlogin = userFactory.userIsLoginSession(userlogin);
+            var result = new
+            {
+                status = 0,
+                data = tags,
+                msg = "fail"
+            };
+            if (userlogin != 0 && searchText.text == "")
+            {
+                tagid = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.tag_id).ToList();
+                tagid = tagid.Distinct().ToList();
+                result = new
+                {
+                    status = 1,
+                    data = tags,
+                    msg = "使用者登入但未有常用標籤"
+                };
+            }
+            else if (searchText.text == "")
+            {
+                result = new
+                {
+                    status = 1,
+                    data = tags,
+                    msg = "使用者未登入且未輸入搜尋字串"
+                };
+
+            }
+            else
+            {
+                searchText.text = searchText.text.Trim();
+                tagid = tagFactory.tagStringToId(searchText.text, db).ToList();
+                if (tagid.Count == 0)
+                {
+                    result = new
+                    {
+                        status = 1,
+                        data = tags,
+                        msg = "未有符合條件之結果"
+                    };
+                }
+            }
+
+            if (tagid.Count > 0)
+            {
+                foreach (int i in tagid)
+                {
+                    tTag tagItem = new tTag();
+                    var tag = db.tags.FirstOrDefault(t => t.id == i);
+                    if (tag != null)
+                    {
+                        tagItem.id = tag.id;
+                        tagItem.name = tag.name;
+                        //tagItem.type = tag.type;
+                        tags.Add(tagItem);
+                    }
+                }
+                result = new
+                {
+                    status = 1,
+                    data = tags,
+                    msg = ""
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+        [Route("send_tag_event")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage send_tag_event(tTagEvent tTagEvent)
+        {
+            int userlogin = 0;
+            var result = new
+            {
+                status = 0,
+                msg = "invalid event type",
+            };
+            userlogin = userFactory.userIsLoginSession(userlogin);
+            if (tTagEvent != null)
+            {
+                if (tTagEvent.action == 1 || tTagEvent.action == 2)
+                {
+                    if (userlogin == 0) { userlogin = 2; }
+                    tagEvent newEvent = new tagEvent();
+                    newEvent.tag_id = tTagEvent.tag_id;
+                    newEvent.user_id = userlogin;
+                    newEvent.tagEvent1 = tTagEvent.action;
+                    newEvent.created = DateTime.Now;
+                    db.tagEvents.Add(newEvent);
+                    db.SaveChanges();
+
+                    result = new
+                    {
+                        status = 1,
+                        msg = "",
+                    };
+                }
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
         private int userIsLoginCookie(int userlogin)

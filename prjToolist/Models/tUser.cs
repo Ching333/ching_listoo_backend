@@ -18,13 +18,13 @@ namespace prjToolist.Models
 
     public class memberLogin
     {
-        public string account { get; set; }
+        public string email { get; set; }
         public string password { get; set; }
     }
 
     public class createMember
     {
-        public string name { get; set; }
+        public string username { get; set; }
         public string email { get; set; }
         public string password { get; set; }
     }
@@ -39,7 +39,7 @@ namespace prjToolist.Models
         public string createdTime { get; set; }
         public string updatedTime { get; set; }
     }
-
+    
     public static class userFactory
     {
         public static int userIsLoginSession(int userlogin)

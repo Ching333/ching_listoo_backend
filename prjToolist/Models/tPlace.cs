@@ -37,7 +37,7 @@ namespace prjToolist.Models
         public string address { get; set; }
         public string type { get; set; }
     }
-
+    //user/queryPocketPlaceInfo
     public class queryPocketPlaceInfo
     {
         public int list_id { get; set; }

@@ -29,7 +29,7 @@ namespace prjToolist.Models
         public string updatedTime { get; set; }
         public string cover { get; set; }
     }
-
+    //user/create_list
     public class viewModelPlaceList
     {
         public string name { get; set; }
@@ -38,14 +38,16 @@ namespace prjToolist.Models
         //public string coverImageURL { get; set; }
         public int[] places { get; set; }
     }
-    
+    //user/add_list_places,remove_list_places
     public class viewModelEditListPlace
     {
         public int[] places { get; set; }
         public int list_id { get; set; }
     }
+    //user/edit_list
     public class viewModelEditListInfo
     {
+        public int list_id { get; set; }
         public string name { get; set; }
         public string description { get; set; }
         public int privacy { get; set; }
@@ -55,10 +57,11 @@ namespace prjToolist.Models
         public int list_id { get; set; }
         public int[] filter { get; set; }
     }
-    public class viewModelSaveListCover
+    //user/set_list_cover
+    public class viewModelSetListCover
     {
         public int list_id { get; set; }
-        public string coverUrl { get; set; }
+        public string cover_image_url { get; set; }
     }
     
     public class queryPlaceList

@@ -14,11 +14,120 @@ using static prjToolist.Models.tagFactory;
 namespace prjToolist.Controllers
 {
     [RoutePrefix("query")]
-    [JwtAuthActionFilter]
+    //[JwtAuthActionFilter]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class ValuesController : ApiController
     {
         private readonly FUENMLEntities db = new FUENMLEntities();
         public int str { get; set; }
+
+
+        [Route("get_user_growth")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_user_growth()
+        {
+            List<vmCountDataValues> vm_userGrowth= new List<vmCountDataValues>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = vm_userGrowth
+
+            };
+            var userGrowthPerDay = (from u in db.users
+                                   group u by (u.created.HasValue? u.created.ToString().Substring(0, 10):"noDateInfo") into g
+                                   select new vmCountDataValues { key = g.Key, count = g.Count() }).ToList();
+
+            if(userGrowthPerDay != null)
+            {
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = userGrowthPerDay
+
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [Route("get_tag_count")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_tag_count()
+        {
+            List<vmCountDataValues> vm_tagCount = new List<vmCountDataValues>();
+            List<vmCountDataValues> vm_tagCountResult = new List<vmCountDataValues>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = vm_tagCountResult
+            };
+            var tagCountTop10 = (from topTag in db.tagRelationships
+                                    group topTag by (topTag.tag_id.ToString()) into g
+                                    select new vmCountDataValues { key = g.Key, count = g.Count()}).OrderByDescending(g1=>g1.count).ToList().Take(10);
+
+            if (tagCountTop10 != null)
+            {
+                foreach(var tagItem in tagCountTop10)
+                {
+                    int tagid;
+                    int.TryParse(tagItem.key, out tagid);
+                    var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
+                    if(hasTag != null)
+                    {
+                        vmCountDataValues r = new vmCountDataValues();
+                        r.key = hasTag;
+                        r.count = tagItem.count;
+                        vm_tagCountResult.Add(r);
+                    }
+                }
+
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = vm_tagCountResult
+
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [Route("get_tag_event")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_tag_event()
+        {
+            List<vmCountDataValues> vm_userGrowth = new List<vmCountDataValues>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = vm_userGrowth
+
+            };
+            var userGrowthPerDay = (from u in db.users
+                                    group u by (u.created.HasValue ? u.created.ToString().Substring(0, 10) : "noDateInfo") into g
+                                    select new vmCountDataValues { key = g.Key, count = g.Count() }).ToList();
+
+            if (userGrowthPerDay != null)
+            {
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = userGrowthPerDay
+
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+
+
 
         [Route("get_user_list")]
         [HttpPost]

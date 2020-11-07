@@ -287,40 +287,40 @@ namespace prjToolist.Controllers
                 return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [Route("set_tag_event")]
-        [HttpPost]
-        [EnableCors("*", "*", "*")]
-        public HttpResponseMessage setEvent(tTagEvent tTagEvent)
-        {
-            int userlogin = 0;
-            var result = new
-            {
-                status = 0,
-                msg = "invalid event type",
-            };
-            userlogin = userFactory.userIsLoginSession(userlogin);
-            if (tTagEvent != null) { 
-            if (tTagEvent.tagEvent == 1 || tTagEvent.tagEvent == 2)
-            {
-                if (userlogin == 0) { userlogin = 2; }
-                tagEvent newEvent = new tagEvent();
-                newEvent.tag_id = tTagEvent.tag_id;
-                newEvent.user_id = userlogin;
-                newEvent.tagEvent1 = tTagEvent.tagEvent;
-                newEvent.created = DateTime.Now;
-                db.tagEvents.Add(newEvent);
-                db.SaveChanges();
+        //[Route("send_tag_event")]
+        //[HttpPost]
+        //[EnableCors("*", "*", "*")]
+        //public HttpResponseMessage send_tag_event(tTagEvent tTagEvent)
+        //{
+        //    int userlogin = 0;
+        //    var result = new
+        //    {
+        //        status = 0,
+        //        msg = "invalid event type",
+        //    };
+        //    userlogin = userFactory.userIsLoginSession(userlogin);
+        //    if (tTagEvent != null) { 
+        //    if (tTagEvent.tagEvent == 1 || tTagEvent.tagEvent == 2)
+        //    {
+        //        if (userlogin == 0) { userlogin = 2; }
+        //        tagEvent newEvent = new tagEvent();
+        //        newEvent.tag_id = tTagEvent.tag_id;
+        //        newEvent.user_id = userlogin;
+        //        newEvent.tagEvent1 = tTagEvent.tagEvent;
+        //        newEvent.created = DateTime.Now;
+        //        db.tagEvents.Add(newEvent);
+        //        db.SaveChanges();
 
-                result = new
-                {
-                    status = 1,
-                    msg = "",
-                };
-            }
-            }
+        //        result = new
+        //        {
+        //            status = 1,
+        //            msg = "",
+        //        };
+        //    }
+        //    }
 
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }
+        //    return Request.CreateResponse(HttpStatusCode.OK, result);
+        //}
 
         [Route("tag_relation")]
         [HttpPost]

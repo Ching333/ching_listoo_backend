@@ -47,6 +47,7 @@ namespace prjToolist.Models
         public string address { get; set; }
         public string type { get; set; }
         public string gmap_id { get; set; }
+        public string photo_url { get; set; }
     }
 
     public class location

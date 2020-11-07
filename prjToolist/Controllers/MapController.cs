@@ -11,7 +11,7 @@ namespace prjToolist.Controllers
 {
     //[JwtAuthActionFilter]
     [RoutePrefix("map")]
-    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
+    [EnableCors(origins: "http://localhost:8080", headers: "*", methods: "*", SupportsCredentials = true)]
     public class MapController : ApiController
     {
         FUENMLEntities db = new FUENMLEntities();
@@ -99,7 +99,7 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [Route("get_place_tag")]
+        [Route("get_place_tags")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage getPlaceTag(tGMapId gMapId)
@@ -169,80 +169,82 @@ namespace prjToolist.Controllers
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-        [Route("search_tag")]
-        [HttpPost]
-        [EnableCors("*", "*", "*")]
-        public HttpResponseMessage searchTag(viewModelSerachTag searchText)
-        {
-            int userlogin = 0;
-            List<tTag> tags = new List<tTag>();
-            List<int> tagid = new List<int>();
-            userlogin = userFactory.userIsLoginSession(userlogin);
-            var result = new
-            {
-                status = 0,
-                data = tags,
-                msg = "fail"
-            };
-            if (userlogin != 0 && searchText.text == "")
-            {
-                tagid = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.tag_id).ToList();
-                tagid = tagid.Distinct().ToList();
-                result = new
-                {
-                    status = 1,
-                    data = tags,
-                    msg = "使用者登入但未有常用標籤"
-                };
-            }
-            else if (searchText.text == "")
-            {
-                result = new
-                {
-                    status = 1,
-                    data = tags,
-                    msg = "使用者未登入且未輸入搜尋字串"
-                };
 
-            }
-            else
-            {
-                searchText.text = searchText.text.Trim();
-                tagid = tagFactory.tagStringToId(searchText.text, db).ToList();
-                if (tagid.Count == 0)
-                {
-                    result = new
-                    {
-                        status = 1,
-                        data = tags,
-                        msg = "未有符合條件之結果"
-                    };
-                }
-            }
+        //[Route("search_tag")]
+        //[HttpPost]
+        //[EnableCors("*", "*", "*")]
+        //public HttpResponseMessage searchTag(viewModelSerachTag searchText)
+        //{
+        //    int userlogin = 0;
+        //    List<tTag> tags = new List<tTag>();
+        //    List<int> tagid = new List<int>();
+        //    userlogin = userFactory.userIsLoginSession(userlogin);
+        //    var result = new
+        //    {
+        //        status = 0,
+        //        data = tags,
+        //        msg = "fail"
+        //    };
+        //    if (userlogin != 0 && searchText.text == "")
+        //    {
+        //        tagid = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.tag_id).ToList();
+        //        tagid = tagid.Distinct().ToList();
+        //        result = new
+        //        {
+        //            status = 1,
+        //            data = tags,
+        //            msg = "使用者登入但未有常用標籤"
+        //        };
+        //    }
+        //    else if (searchText.text == "")
+        //    {
+        //        result = new
+        //        {
+        //            status = 1,
+        //            data = tags,
+        //            msg = "使用者未登入且未輸入搜尋字串"
+        //        };
 
-            if (tagid.Count > 0)
-            {
-                foreach (int i in tagid)
-                {
-                    tTag tagItem = new tTag();
-                    var tag = db.tags.FirstOrDefault(t => t.id == i);
-                    if (tag != null)
-                    {
-                        tagItem.id = tag.id;
-                        tagItem.name = tag.name;
-                        //tagItem.type = tag.type;
-                        tags.Add(tagItem);
-                    }
-                }
-                result = new
-                {
-                    status = 1,
-                    data = tags,
-                    msg = ""
-                };
-            }
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }
+        //    }
+        //    else
+        //    {
+        //        searchText.text = searchText.text.Trim();
+        //        tagid = tagFactory.tagStringToId(searchText.text, db).ToList();
+        //        if (tagid.Count == 0)
+        //        {
+        //            result = new
+        //            {
+        //                status = 1,
+        //                data = tags,
+        //                msg = "未有符合條件之結果"
+        //            };
+        //        }
+        //    }
+
+        //    if (tagid.Count > 0)
+        //    {
+        //        foreach (int i in tagid)
+        //        {
+        //            tTag tagItem = new tTag();
+        //            var tag = db.tags.FirstOrDefault(t => t.id == i);
+        //            if (tag != null)
+        //            {
+        //                tagItem.id = tag.id;
+        //                tagItem.name = tag.name;
+        //                //tagItem.type = tag.type;
+        //                tags.Add(tagItem);
+        //            }
+        //        }
+        //        result = new
+        //        {
+        //            status = 1,
+        //            data = tags,
+        //            msg = ""
+        //        };
+        //    }
+        //    return Request.CreateResponse(HttpStatusCode.OK, result);
+        //}
+
         [Route("candidate_tag")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
