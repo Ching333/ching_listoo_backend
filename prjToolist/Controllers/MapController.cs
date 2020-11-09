@@ -99,76 +99,76 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [Route("get_place_tags")]
-        [HttpPost]
-        [EnableCors("*", "*", "*")]
-        public HttpResponseMessage getPlaceTag(tGMapId gMapId)
-        {
-            List<tTag> placeTags = new List<tTag>();
-            List<tTag> myTags = new List<tTag>();
-            List<int> usertags = new List<int>();
-            int userlogin = 0;
-            var placeId = db.places.FirstOrDefault(p => p.gmap_id == gMapId.gmap_id).id;
-            var tagList = db.tagRelationships.Where(t => t.place_id == placeId).Select(p => p.tag_id).ToList();
-            int[] item = tagList.Distinct().ToArray();
-            userlogin = userFactory.userIsLoginSession(userlogin);
-            var dataForm = new
-            {
-                my_tags = myTags,
-                place_tags = placeTags
-            };
-            var result = new
-            {
-                status = 0,
-                data = dataForm,
-                msg = "fail"
-            };
-            if (userlogin != 0)
-            {
-                usertags= db.tagRelationships.Where(t => t.place_id == placeId&&t.user_id==userlogin).Select(p => p.tag_id).ToList();
-                if (usertags.Count > 0)
-                {
-                    foreach(int i in usertags)
-                    {
-                        tTag tagItem = new tTag();
-                        var tag = db.tags.FirstOrDefault(t => t.id == i);
-                        tagItem.id = tag.id;
-                        tagItem.name = tag.name;
-                        myTags.Add(tagItem);
-                    }
-                }
-                dataForm = new
-                {
-                    my_tags = myTags,
-                    place_tags = placeTags
-                };
-                result = new
-                {
-                    status = 1,
-                    data = dataForm,
-                    msg = ""
-                };
-            }
-            if (tagList.Count > 0) {
-            foreach(int i in item)
-            {
-                tTag tagItem = new tTag();
-                var tag = db.tags.FirstOrDefault(t => t.id == i);
-                tagItem.id = tag.id;
-                tagItem.name = tag.name;
-                //tagItem.type = tag.type;
-                placeTags.Add(tagItem);
+        //[Route("get_place_tags")]
+        //[HttpPost]
+        //[EnableCors("*", "*", "*")]
+        //public HttpResponseMessage getPlaceTag(tGMapId gMapId)
+        //{
+        //    List<tTag> placeTags = new List<tTag>();
+        //    List<tTag> myTags = new List<tTag>();
+        //    List<int> usertags = new List<int>();
+        //    int userlogin = 0;
+        //    var placeId = db.places.FirstOrDefault(p => p.gmap_id == gMapId.gmap_id).id;
+        //    var tagList = db.tagRelationships.Where(t => t.place_id == placeId).Select(p => p.tag_id).ToList();
+        //    int[] item = tagList.Distinct().ToArray();
+        //    userlogin = userFactory.userIsLoginSession(userlogin);
+        //    var dataForm = new
+        //    {
+        //        my_tags = myTags,
+        //        place_tags = placeTags
+        //    };
+        //    var result = new
+        //    {
+        //        status = 0,
+        //        data = dataForm,
+        //        msg = "fail"
+        //    };
+        //    if (userlogin != 0)
+        //    {
+        //        usertags= db.tagRelationships.Where(t => t.place_id == placeId&&t.user_id==userlogin).Select(p => p.tag_id).ToList();
+        //        if (usertags.Count > 0)
+        //        {
+        //            foreach(int i in usertags)
+        //            {
+        //                tTag tagItem = new tTag();
+        //                var tag = db.tags.FirstOrDefault(t => t.id == i);
+        //                tagItem.id = tag.id;
+        //                tagItem.name = tag.name;
+        //                myTags.Add(tagItem);
+        //            }
+        //        }
+        //        dataForm = new
+        //        {
+        //            my_tags = myTags,
+        //            place_tags = placeTags
+        //        };
+        //        result = new
+        //        {
+        //            status = 1,
+        //            data = dataForm,
+        //            msg = ""
+        //        };
+        //    }
+        //    if (tagList.Count > 0) {
+        //    foreach(int i in item)
+        //    {
+        //        tTag tagItem = new tTag();
+        //        var tag = db.tags.FirstOrDefault(t => t.id == i);
+        //        tagItem.id = tag.id;
+        //        tagItem.name = tag.name;
+        //        //tagItem.type = tag.type;
+        //        placeTags.Add(tagItem);
 
-                result = new
-                {
-                    status = 1,
-                    data = dataForm,
-                    msg = ""
-                };
-                }
-            }
-            return Request.CreateResponse(HttpStatusCode.OK, result);
-        }
+        //        result = new
+        //        {
+        //            status = 1,
+        //            data = dataForm,
+        //            msg = ""
+        //        };
+        //        }
+        //    }
+        //    return Request.CreateResponse(HttpStatusCode.OK, result);
+        //}
 
         //[Route("search_tag")]
         //[HttpPost]
