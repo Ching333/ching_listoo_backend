@@ -16,20 +16,22 @@ namespace prjToolist.Models
         public Nullable<System.DateTime> created { get; set; }
     }
 
+    // for auth/login
     public class memberLogin
     {
         public string email { get; set; }
         public string password { get; set; }
     }
 
+    // for auth/register
     public class createMember
     {
-        public string username { get; set; }
+        public string name { get; set; }
         public string email { get; set; }
         public string password { get; set; }
     }
 
-    public class queryUserList
+    public class updateMember
     {
         public int id { get; set; }
         public string name { get; set; }
@@ -40,6 +42,17 @@ namespace prjToolist.Models
         public string updatedTime { get; set; }
     }
     
+    public class queryUserList
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public string email { get; set; }
+        public string password { get; set; }
+        public int authority { get; set; }
+        public string createdTime { get; set; }
+        public string updatedTime { get; set; }
+    }
+
     public static class userFactory
     {
         public static int userIsLoginSession(int userlogin)

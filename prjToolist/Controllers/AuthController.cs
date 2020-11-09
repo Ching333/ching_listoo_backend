@@ -28,7 +28,7 @@ namespace prjToolist.Controllers
         [HttpPost]
         public HttpResponseMessage loginPost(memberLogin loginUser)
         {
-            var verifyAccount = db.users.FirstOrDefault(P => P.email == loginUser.email && P.password == loginUser.password);
+            var verifyAccount = db.users.FirstOrDefault(v => v.email == loginUser.email && v.password == loginUser.password);
             //var cookie = new CookieHeaderValue("session-id", verifyAccount.id.ToString());
             //cookie.Expires = DateTimeOffset.Now.AddDays(1);
             //cookie.Domain = Request.RequestUri.Host;
@@ -37,7 +37,6 @@ namespace prjToolist.Controllers
             {
                 username = "",
                 user_id = ""
-
             };
             var result = new
             {
@@ -100,10 +99,10 @@ namespace prjToolist.Controllers
             //    resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
             //}
             int userlogin = 0;
-            userlogin = (new UserController()).userIsLoginCookie(userlogin);
-            if (HttpContext.Current.Session["SK_login"] != null|| userlogin!=0)
+            // userlogin = (new UserController()).userIsLoginCookie(userlogin);
+            if (userlogin == 0)
             {
-                HttpContext.Current.Session["SK_login"] = null;
+                // HttpContext.Current.Session["SK_login"] = null;
                 result = new
                 {
                     status = 1,
@@ -135,33 +134,34 @@ namespace prjToolist.Controllers
                 msg = "fail,email exist",
             };
             if (isnullormember == null)
-            {   if(createMemberModel.username!= null&& createMemberModel.password != null) { 
-                user newmember = new user();
-                newmember.name = createMemberModel.username;
-                newmember.password = createMemberModel.password;
-                newmember.email = createMemberModel.email;
-                newmember.created = DateTime.Now;
-                newmember.updated = DateTime.Now;
-                newmember.authority = 1;
-                db.users.Add(newmember);
-                db.SaveChanges();
-                result = new
+            {
+                if (createMemberModel.name != null && createMemberModel.password != null)
                 {
-                    status = 1,
-                    msg = "Register success",
-                };
+                    user newmember = new user();
+                    newmember.name = createMemberModel.name;
+                    newmember.password = createMemberModel.password;
+                    newmember.email = createMemberModel.email;
+                    newmember.created = DateTime.Now;
+                    //newmember.updated = DateTime.Now; // -->register need updated time?
+                    newmember.authority = 1;
+                    db.users.Add(newmember);
+                    db.SaveChanges();
+                    result = new
+                    {
+                        status = 1,
+                        msg = "Register success",
+                    };
                 }
                 result = new
                 {
                     status = 1,
                     msg = "註冊會員資料不完整",
                 };
-
-
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-        
+
+        //TODO: remove befor final released
         [Route("test")]
         [HttpPost]
         public HttpResponseMessage testSession()

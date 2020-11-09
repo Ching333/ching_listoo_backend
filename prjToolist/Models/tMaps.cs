@@ -17,16 +17,19 @@ namespace prjToolist.Models
         public float lat { get; set; }
     }
 
+    //for map/get_marks
     public class tGmap
     {
+        public int[] filter { get; set; }
         public tStartPosition from { get; set; }
         public tEndPosition to { get; set; }
-        public int[] filter { get; set; }
     }
 
+    //for map/get_place_info
+    //for user/get_place_tags
     public class tGMapId
     {
-        public string gmap_id { get; set; }
+        public int place_id { get; set; }
     }
 
     //public class placeInfo
@@ -37,6 +40,7 @@ namespace prjToolist.Models
     //    public string type { get; set; }
     //}
 
+    //for map/get_marks 
     public class placeInfo
     {
         public int id { get; set; }
@@ -47,20 +51,31 @@ namespace prjToolist.Models
         public string address { get; set; }
         public string type { get; set; }
         public string gmap_id { get; set; }
+    }
+
+    //for map/get_place_info
+    public class placeInfoData
+    {
+        public string name { get; set; }
+        public string phone { get; set; }
+        public string address { get; set; }
+        public string type { get; set; }
         public string photo_url { get; set; }
     }
 
+    /*******---for map/get_marks---*******/
     public class location
     {
-        public float lon { get; set; }
-        public float lat { get; set; }
+        public decimal lon { get; set; }
+        public decimal lat { get; set; }
     }
 
     public class tMapMark
     {
-        public string gmap_id { get; set; }
+        public int place_id { get; set; }
         public location location { get; set; }
     }
+    /*************************************/
 
     public class candidatePlacePara
     {

@@ -5,11 +5,12 @@ using System.Web;
 
 namespace prjToolist.Models
 {
+    // for common/get_recommend_lists
     public class tTag
     {
         public int id { get; set; }
+        public int type { get; set; }
         public string name { get; set; }
-        //public int type { get; set; }
     }
 
     public class tagString
@@ -41,12 +42,13 @@ namespace prjToolist.Models
         public string gmap_id { get; set; }
         public int[] tag_id { get; set; }
     }
+
     public class viewModelSerachTag
     {
-        public int place_id { get; set; }
+        public string gmap_id { get; set; }
         public string text { get; set; }
     }
-    //user/modify_place_tag
+
     public class viewModelTagChange
     {
         public int place_id { get; set; }
@@ -128,5 +130,10 @@ namespace prjToolist.Models
             intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
             return intersectResult;
         }
+
+        //public static List<int> listFilter(ref List<int> intersectPlaceList, int i, FUENMLEntities db)
+        //{
+        //    var 
+        //}
     }
 }

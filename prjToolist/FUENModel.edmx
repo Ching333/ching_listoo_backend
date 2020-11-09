@@ -53,7 +53,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="created" Type="datetime2" Precision="0" Nullable="false" />
           <Property Name="user_id" Type="int" Nullable="false" />
           <Property Name="tag_id" Type="int" Nullable="false" />
@@ -152,7 +152,7 @@
           <Key>
             <PropertyRef Name="id" />
           </Key>
-          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="created" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="user_id" Type="Int32" Nullable="false" />
           <Property Name="tag_id" Type="Int32" Nullable="false" />

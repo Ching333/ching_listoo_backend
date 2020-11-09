@@ -20,39 +20,125 @@ namespace prjToolist.Controllers
         FUENMLEntities db = new FUENMLEntities();
 
         [Route("get_recommend_lists")]
-        [HttpGet]
+        [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage getRecommendList()
+        public HttpResponseMessage getRecommendList(tFilter filter)
         {
-            var list = db.placeLists.Select(p=>p.id).ToList();
             List<tPlaceList> placeList = new List<tPlaceList>();
+            List<int> intersectPlaceId = new List<int>();
+            List<int> intersectPlaceListId = new List<int>();
+
+            int[] tagIdList = db.tags.Select(t => t.id).ToArray();
+            string[] typeList = db.places.Select(p => p.type).Distinct().ToArray();
+            Array.Sort(tagIdList);
+            List<tTag> tagList = new List<tTag>();
+            List<int> tagsList = new List<int>();
+            foreach (int i in tagIdList)
+            {
+                var tagModel = db.tags.FirstOrDefault(t => t.id == i);
+                tTag tagItem = new tTag();
+                tagItem.id = i;
+                tagItem.type = tagModel.type;
+                tagItem.name = tagModel.name;
+                tagList.Add(tagItem);
+            }
+            var tagInfo = new
+            {
+                lists = placeList,
+                system_tags = typeList,
+                user_tags = tagList
+            };
             var result = new
             {
                 status = 1,
-                data = placeList,
+                data = tagInfo,
                 msg = ""
             };
-            if (list.Count() > 0)
+
+            int userlogin = 0;
+            var entirePlaces = db.places.Select(p => p.id).ToList();
+            var entirePlaceLists = db.placeLists.Select(p => p.id).ToList();
+            int filterCount = filter.filter.Length;
+            intersectPlaceId = entirePlaces;
+            intersectPlaceListId = entirePlaceLists;
+
+            if (filterCount > 0)
             {
-                int[] idList = list.ToArray();
-                foreach(int i in idList)
+                foreach (int i in filter.filter)
+                {
+                    intersectPlaceId = tagFactory.searchTag(userlogin, ref intersectPlaceId, i, db);
+                }
+                Array.Sort(intersectPlaceId.Distinct().ToArray());
+                foreach (int i in intersectPlaceId)
+                {
+                    var listFilter = db.placeRelationships.Where(p => p.place_id == i).Select(p => p.placelist_id).ToList();
+                    tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == i).Select(q => q.tag_id).ToList());
+                    intersectPlaceListId = intersectPlaceListId.Intersect(listFilter).ToList();
+                }
+                tagsList = tagsList.Distinct().ToList();
+                Array.Sort(tagsList.ToArray());
+                Array.Sort(intersectPlaceListId.Distinct().ToArray());
+                foreach(int i in intersectPlaceListId)
                 {
                     var placeListModel = db.placeLists.FirstOrDefault(p => p.id == i);
                     tPlaceList placeListItem = new tPlaceList();
                     placeListItem.id = placeListModel.id;
-                    placeListItem.user_id = placeListModel.user_id;
-                    placeListItem.privacy = placeListModel.privacy;
+                    placeListItem.creator_id = placeListModel.user_id;
                     placeListItem.name = placeListModel.name;
-                    placeListItem.description = placeListModel.description;
                     //placeListItem.coverImageURL = placeListModel.cover.ToString();
-                    placeListItem.createdTime = placeListModel.created.ToString();
-                    placeListItem.updatedTime = placeListModel.updated.ToString();
                     placeList.Add(placeListItem);
                 }
+                //if (tagsList.Count > 0)
+                //{
+                //    foreach (int i in tagsList)
+                //    {
+                //        var tagModel = db.tags.FirstOrDefault(p => p.id == i && p.type == 2);
+                //        if (tagModel != null)
+                //        {
+                //            tTag tagItem = new tTag();
+                //            tagItem.id = tagModel.id;
+                //            tagItem.name = tagModel.name;
+                //            tagItem.type = tagModel.type;
+                //            tagList.Add(tagItem);
+                //        }
+                //    }
+                //}
+
+                tagInfo = new
+                {
+                    lists = placeList,
+                    system_tags = typeList,
+                    user_tags = tagList
+                };
                 result = new
                 {
                     status = 1,
-                    data = placeList,
+                    data = tagInfo,
+                    msg = ""
+                };
+            }
+            else
+            {
+                foreach(int i in entirePlaceLists)
+                {
+                    var placeListModel = db.placeLists.FirstOrDefault(p => p.id == i);
+                    tPlaceList placeListItem = new tPlaceList();
+                    placeListItem.id = placeListModel.id;
+                    placeListItem.creator_id = placeListModel.user_id;
+                    placeListItem.name = placeListModel.name;
+                    //placeListItem.coverImageURL = placeListModel.cover.ToString();
+                    placeList.Add(placeListItem);
+                }
+                tagInfo = new
+                {
+                    lists = placeList,
+                    system_tags = typeList,
+                    user_tags = tagList
+                };
+                result = new
+                {
+                    status = 1,
+                    data = tagInfo,
                     msg = ""
                 };
             }
@@ -65,11 +151,13 @@ namespace prjToolist.Controllers
         public HttpResponseMessage getHotTag()
         {
             int[] idList = db.tags.Select(t => t.id).ToArray();
+            string[] typeList = db.places.Select(p => p.type).Distinct().ToArray();
             Array.Sort(idList); 
             List<tTag> tagList = new List<tTag>();
             var tagInfo = new
             {
-                lists = tagList
+                system_tags = typeList,
+                user_tags = tagList
             };
             var result = new
             {
@@ -86,11 +174,12 @@ namespace prjToolist.Controllers
                     tTag tagItem = new tTag();
                     tagItem.id = i;
                     tagItem.name = tagModel.name;
-                    //tagItem.type = tagModel.type;
+                    tagItem.type = tagModel.type;
                     tagList.Add(tagItem);
                     tagInfo = new
                     {
-                        lists = tagList
+                        system_tags = typeList,
+                        user_tags = tagList
                     };
                     result = new
                     {
@@ -102,29 +191,74 @@ namespace prjToolist.Controllers
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-        
 
-        [Route("get_list")]
+        [Route("get_list_info")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage GetList(viewModelGetListPlace getListInfo)
+        public HttpResponseMessage GetListInfo(getPlaceListbyId querybody)
+        {
+            placeListInfo infoItem = new placeListInfo();
+            int list_createrId = 0;
+            var listInfo = new
+            {
+                info = infoItem
+            };
+            var result = new
+            {
+                status = 0,
+                msg="fail",
+                data=listInfo
+            };
+            var placeListModel = db.placeLists.FirstOrDefault(p => p.id == querybody.list_id);
+            list_createrId = db.placeLists.Where(p => p.id == querybody.list_id).Select(q => q.user_id).FirstOrDefault();
+            var listCreator = db.users.Where(u => u.id == list_createrId).FirstOrDefault();
+            if (placeListModel != null && listCreator != null)
+            {
+                infoItem.id = placeListModel.id;
+                infoItem.creator_id = placeListModel.user_id;
+                infoItem.name = placeListModel.name;
+                infoItem.creator_username = listCreator.name;
+                infoItem.description = placeListModel.description;
+                infoItem.privacy = placeListModel.privacy;
+                infoItem.createdTime = placeListModel.created != null ? placeListModel.created.ToString().Substring(0, 10) : "";
+                infoItem.updatedTime = placeListModel.updated != null ? placeListModel.updated.ToString().Substring(0, 10) : "";
+
+                listInfo = new
+                {
+                    info = infoItem
+                };
+                result = new
+                {
+                    status = 1,
+                    msg = "",
+                    data = listInfo
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+
+        [Route("get_list_detail")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage GetListDetail(viewModelGetListPlace getListInfo)
         {   //無論公開或私人都會用此功能 所以要找創建清單的userid非登入者的userid
             List<string> systemTagResult = new List<string>();
             List<int> resultplaceid = new List<int>();
             List<int> searchallplaceinlist = new List<int>();
             List<int> intersectResult = new List<int>();
             List<int> tagsList = new List<int>();
-            List<placeInfo> resultPlaceInfo = new List<placeInfo>();
+            List<listDetailPlace> resultPlaceInfo = new List<listDetailPlace>();
             List<tTag> resultTagInfo = new List<tTag>();
             placeListInfo infoItem = new placeListInfo();
             int[] tFilterid = getListInfo.filter;
-            int list_creater = 0;
+            int list_createrId = 0;
             var dataForm = new
             {
                 info = infoItem,
                 places = resultPlaceInfo,
-                user_tags = resultTagInfo,
-                systemtags = systemTagResult
+                systemtags = systemTagResult,
+                user_tags = resultTagInfo
             };
             var result = new
             {
@@ -132,28 +266,29 @@ namespace prjToolist.Controllers
                 msg = "fail",
                 data = dataForm
             };
-            var li = db.placeLists.Where(p => p.id == getListInfo.list_id).Select(q=>q).FirstOrDefault();
+            var listModel = db.placeLists.Where(p => p.id == getListInfo.list_id).FirstOrDefault();
             //此結果為特定清單中全部的地點id
             //無論公開或私人都會用此功能 所以要找創建清單的userid非登入者的userid
-            if (li != null) {
-                searchallplaceinlist = db.placeRelationships.Where(p => p.placelist_id ==li.id)
-                .Select(q => q.place_id).ToList();
-                list_creater = db.placeLists.Where(p => p.id == getListInfo.list_id).Select(q => q.user_id).FirstOrDefault();
-                
-                infoItem.id = li.id;
-                infoItem.userId = li.user_id;
-                infoItem.name = li.name;
-                infoItem.description = li.description;
-                infoItem.privacy = li.privacy;
-                infoItem.createdTime = li.created != null ? li.created.ToString().Substring(0, 10) : "";
-                infoItem.updatedTime = li.updated != null ? li.updated.ToString().Substring(0, 10) : "";
+            if (listModel != null)
+            {
+                searchallplaceinlist = db.placeRelationships.Where(p => p.placelist_id == listModel.id).Select(q => q.place_id).ToList();
+                list_createrId = db.placeLists.Where(p => p.id == getListInfo.list_id).Select(q => q.user_id).FirstOrDefault();
+                var listCreator = db.users.Where(u => u.id == list_createrId).FirstOrDefault();
+                infoItem.id = listModel.id;
+                infoItem.creator_id = listModel.user_id;
+                infoItem.name = listModel.name;
+                infoItem.creator_username = listCreator.name;
+                infoItem.description = listModel.description;
+                infoItem.privacy = listModel.privacy;
+                infoItem.createdTime = listModel.created != null ? listModel.created.ToString().Substring(0, 10) : "";
+                infoItem.updatedTime = listModel.updated != null ? listModel.updated.ToString().Substring(0, 10) : "";
 
                 dataForm = new
                 {
                     info = infoItem,
                     places = resultPlaceInfo,
-                    user_tags = resultTagInfo,
-                    systemtags = systemTagResult
+                    systemtags = systemTagResult,
+                    user_tags = resultTagInfo
                 };
                 result = new
                 {
@@ -163,19 +298,19 @@ namespace prjToolist.Controllers
                 };
             }
             //此結果為特定清單中篩選出有標籤的地點id
-            if (tFilterid != null&& list_creater!=0)
+            if (tFilterid != null && list_createrId != 0)
             {
                 intersectResult = searchallplaceinlist;
                 foreach (int i in tFilterid)
                 {
-                    intersectResult = tagFactory.searchTag(list_creater, ref intersectResult, i, db);
+                    intersectResult = tagFactory.searchTag(list_createrId, ref intersectResult, i, db);
                     //var searchplacehastag = db.tagRelationships.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
                     //intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
                     //foreach(int p in unionResult) {
                     //    resultplaceid.Add(p);
                     //}
                 }
-                intersectResult= intersectResult.Distinct().ToList();
+                intersectResult = intersectResult.Distinct().ToList();
             }
             if (intersectResult.Count > 0)
             {
@@ -184,18 +319,19 @@ namespace prjToolist.Controllers
                     var placeItem = db.places.Where(p => p.id == i).Select(q => q).FirstOrDefault();
                     if (placeItem != null)
                     {
-                        if (placeItem.type != null) { systemTagResult.Add(placeItem.type); }
+                        if (placeItem.type != null)  systemTagResult.Add(placeItem.type); 
 
-                        placeInfo rPlace = new placeInfo();
-                        rPlace.name = placeItem.name;
-                        rPlace.phone = placeItem.phone;
-                        rPlace.address = placeItem.address;
-                        rPlace.type = placeItem.type;
-                        rPlace.longitude = placeItem.longitude;
-                        rPlace.latitude = placeItem.latitude;
-                        resultPlaceInfo.Add(rPlace);
+                        listDetailPlace placeDetail = new listDetailPlace();
+                        placeDetail.id = placeItem.id;
+                        placeDetail.gmap_id = placeItem.gmap_id;
+                        placeDetail.name = placeItem.name;
+                        placeDetail.phone = placeItem.phone;
+                        placeDetail.address = placeItem.address;
+                        placeDetail.type = placeItem.type;
+                        //placeDetail.photo_url = placeItem.photo.ToString(); // photo type in db is byte[]
+                        resultPlaceInfo.Add(placeDetail);
                     }
-                    tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == i && p.user_id == list_creater).Select(q => q.tag_id).ToList());
+                    tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == i && p.user_id == list_createrId).Select(q => q.tag_id).ToList());
                     //var test = from p in db.tagRelations where p.place_id == i group p.tag_id by p.user_id == userlogin ?"userTag":"othersTag" into g select new {g.Key } ;
                 }
                 tagsList = tagsList.Distinct().ToList();
@@ -204,8 +340,8 @@ namespace prjToolist.Controllers
                 {
                     info = infoItem,
                     places = resultPlaceInfo,
-                    user_tags = resultTagInfo,
-                    systemtags = systemTagResult
+                    systemtags = systemTagResult,
+                    user_tags = resultTagInfo
                 };
                 result = new
                 {
@@ -224,103 +360,68 @@ namespace prjToolist.Controllers
                         tTag t = new tTag();
                         t.id = rtag.id;
                         t.name = rtag.name;
-                        //t.type = rtag.type;
+                        t.type = rtag.type;
                         resultTagInfo.Add(t);
                     }
                 }
             }
-                //var place = db.placeLists.Where(p => p.id == getListInfo.list_id).FirstOrDefault();
-                //var placeSpot = db.placeRelationships.Where(p => p.placelist_id == getListInfo.list_id).Select(p => p.place_id).ToList();
-                //List<placeListInfo> infoList = new List<placeListInfo>();
-                //List<tPlaceInfo> relationPlace = new List<tPlaceInfo>();
-                //List<tagInfo> tagInfoList = new List<tagInfo>();
+            //var place = db.placeLists.Where(p => p.id == getListInfo.list_id).FirstOrDefault();
+            //var placeSpot = db.placeRelationships.Where(p => p.placelist_id == getListInfo.list_id).Select(p => p.place_id).ToList();
+            //List<placeListInfo> infoList = new List<placeListInfo>();
+            //List<tPlaceInfo> relationPlace = new List<tPlaceInfo>();
+            //List<tagInfo> tagInfoList = new List<tagInfo>();
 
-                //List<int> idList = new List<int>();
-                //List<int> tagList = new List<int>();
+            //List<int> idList = new List<int>();
+            //List<int> tagList = new List<int>();
 
-                //for (int i = 0; i < placeSpot.Count(); i++)
-                //{
-                //    idList.Add(placeSpot[i]);
-                //}
-                //int[] terms = idList.ToArray();
+            //for (int i = 0; i < placeSpot.Count(); i++)
+            //{
+            //    idList.Add(placeSpot[i]);
+            //}
+            //int[] terms = idList.ToArray();
 
-                //placeListInfo infoItem = new placeListInfo();
-                //infoItem.userId = place.user_id;
-                //infoItem.name = place.name;
-                //infoItem.description = place.description;
-                //infoItem.privacy = place.privacy;
-                //infoItem.createdTime = place.created.ToString();
-                //infoItem.updatedTime = place.updated.ToString();
-                ////byte[] binaryString = (byte[])place.cover;
-                ////info.cover = Encoding.UTF8.GetString(binaryString);
-                //infoList.Add(infoItem);
+            //placeListInfo infoItem = new placeListInfo();
+            //infoItem.userId = place.user_id;
+            //infoItem.name = place.name;
+            //infoItem.description = place.description;
+            //infoItem.privacy = place.privacy;
+            //infoItem.createdTime = place.created.ToString();
+            //infoItem.updatedTime = place.updated.ToString();
+            ////byte[] binaryString = (byte[])place.cover;
+            ////info.cover = Encoding.UTF8.GetString(binaryString);
+            //infoList.Add(infoItem);
 
-                //foreach (var i in terms)
-                //{
-                //    var tagId = db.tagRelationships.Where(p => p.place_id == i).Select(p => p.tag_id).ToList();
-                //    tPlaceInfo exportPlaceInfo = new tPlaceInfo();
-                //    var placeModel = db.places.FirstOrDefault(p => p.id == i);
-                //    for (int j = 0; j < tagId.Count(); j++)
-                //    {
-                //        tagList.Add(tagId[j]);
-                //    }
-                //    exportPlaceInfo.name = placeModel.name;
-                //    exportPlaceInfo.longitude = placeModel.longitude;
-                //    exportPlaceInfo.latitude = placeModel.latitude;
-                //    exportPlaceInfo.phone = placeModel.phone;
-                //    exportPlaceInfo.address = placeModel.address;
-                //    exportPlaceInfo.type = placeModel.type;
-                //    exportPlaceInfo.gmap_id = placeModel.gmap_id;
-                //    relationPlace.Add(exportPlaceInfo);
-                //}
+            //foreach (var i in terms)
+            //{
+            //    var tagId = db.tagRelationships.Where(p => p.place_id == i).Select(p => p.tag_id).ToList();
+            //    tPlaceInfo exportPlaceInfo = new tPlaceInfo();
+            //    var placeModel = db.places.FirstOrDefault(p => p.id == i);
+            //    for (int j = 0; j < tagId.Count(); j++)
+            //    {
+            //        tagList.Add(tagId[j]);
+            //    }
+            //    exportPlaceInfo.name = placeModel.name;
+            //    exportPlaceInfo.longitude = placeModel.longitude;
+            //    exportPlaceInfo.latitude = placeModel.latitude;
+            //    exportPlaceInfo.phone = placeModel.phone;
+            //    exportPlaceInfo.address = placeModel.address;
+            //    exportPlaceInfo.type = placeModel.type;
+            //    exportPlaceInfo.gmap_id = placeModel.gmap_id;
+            //    relationPlace.Add(exportPlaceInfo);
+            //}
 
-                //int[] tagArray = tagList.Distinct().ToArray();
+            //int[] tagArray = tagList.Distinct().ToArray();
 
-                //foreach (int t in tagArray)
-                //{
-                //    var exportTagInfo = new tagInfo();
-                //    var tagInfoModel = db.tags.FirstOrDefault(p => p.id == t);
-                //    exportTagInfo.name = tagInfoModel.name;
-                //    exportTagInfo.type = tagInfoModel.type;
-                //    tagInfoList.Add(exportTagInfo);
-                //}
-                return Request.CreateResponse(HttpStatusCode.OK, result);
+            //foreach (int t in tagArray)
+            //{
+            //    var exportTagInfo = new tagInfo();
+            //    var tagInfoModel = db.tags.FirstOrDefault(p => p.id == t);
+            //    exportTagInfo.name = tagInfoModel.name;
+            //    exportTagInfo.type = tagInfoModel.type;
+            //    tagInfoList.Add(exportTagInfo);
+            //}
+            return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-
-        //[Route("send_tag_event")]
-        //[HttpPost]
-        //[EnableCors("*", "*", "*")]
-        //public HttpResponseMessage send_tag_event(tTagEvent tTagEvent)
-        //{
-        //    int userlogin = 0;
-        //    var result = new
-        //    {
-        //        status = 0,
-        //        msg = "invalid event type",
-        //    };
-        //    userlogin = userFactory.userIsLoginSession(userlogin);
-        //    if (tTagEvent != null) { 
-        //    if (tTagEvent.tagEvent == 1 || tTagEvent.tagEvent == 2)
-        //    {
-        //        if (userlogin == 0) { userlogin = 2; }
-        //        tagEvent newEvent = new tagEvent();
-        //        newEvent.tag_id = tTagEvent.tag_id;
-        //        newEvent.user_id = userlogin;
-        //        newEvent.tagEvent1 = tTagEvent.tagEvent;
-        //        newEvent.created = DateTime.Now;
-        //        db.tagEvents.Add(newEvent);
-        //        db.SaveChanges();
-
-        //        result = new
-        //        {
-        //            status = 1,
-        //            msg = "",
-        //        };
-        //    }
-        //    }
-
-        //    return Request.CreateResponse(HttpStatusCode.OK, result);
-        //}
 
         [Route("tag_relation")]
         [HttpPost]
