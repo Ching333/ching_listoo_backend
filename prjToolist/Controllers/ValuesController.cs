@@ -184,7 +184,53 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        [Route("get_place_tag_each")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_place_tag_each()
+        {
+            List<vmCountDataValues> vm_placetagCount = new List<vmCountDataValues>();
+            List<vmCountDataValuesTwoKey> vm_placetagCountResult = new List<vmCountDataValuesTwoKey>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = vm_placetagCountResult
+            };
+            var tagPlaceTop10each = (from topPlace in db.tagRelationships
+                                 group topPlace by new { placeid=topPlace.place_id.ToString(), tagid=topPlace.tag_id.ToString() } into g
+                                 select new vmCountDataValuesTwoKey { key = g.Key.placeid,key2= g.Key.tagid, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(10);
 
+            if (tagPlaceTop10each != null)
+            {
+                foreach (var placeItem in tagPlaceTop10each)
+                {
+                    int placeid;
+                    int.TryParse(placeItem.key.ToString(), out placeid);
+                    int tagid;
+                    int.TryParse(placeItem.key2.ToString(), out tagid);
+                    var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
+                    var hasPlace = db.places.Where(p => p.id == placeid).Select(q => q.name).FirstOrDefault();
+                    if (hasPlace != null&& hasTag!=null)
+                    {
+                        vmCountDataValuesTwoKey r = new vmCountDataValuesTwoKey();
+                        r.key = hasPlace;
+                        r.key2 = hasTag;
+                        r.count = placeItem.count;
+                        vm_placetagCountResult.Add(r);
+                    }
+                }
+
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = vm_placetagCountResult
+
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
 
 
 
