@@ -428,7 +428,7 @@ namespace prjToolist.Controllers
             //}
             var dataform = new
             {
-                id = listId
+                list_id = listId
             };
             var result = new
             {
@@ -480,7 +480,7 @@ namespace prjToolist.Controllers
                     //Debug.WriteLine(listId);
                     dataform = new
                     {
-                        id = listId
+                        list_id = listId
                     };
 
                     result = new
@@ -1050,6 +1050,7 @@ namespace prjToolist.Controllers
                         tTag tagItem = new tTag();
                         var tag = db.tags.FirstOrDefault(t => t.id == i);
                         tagItem.id = tag.id;
+                        tagItem.type = tag.type;
                         tagItem.name = tag.name;
                         myTags.Add(tagItem);
                     }
@@ -1130,7 +1131,12 @@ namespace prjToolist.Controllers
             var currentCookie = Request.Headers.GetCookies("session_id").FirstOrDefault();
             if (Request.Headers.Contains("session_id"))
             {
-                userlogin = int.Parse(Request.Headers.GetValues("session_id").FirstOrDefault());
+                int _userlogin = 0;
+                bool userIslogin = int.TryParse(Request.Headers.GetValues("session_id").FirstOrDefault(), out _userlogin);
+                if (userIslogin)
+                {
+                    userlogin = _userlogin;
+                }
             }
 
             return userlogin;

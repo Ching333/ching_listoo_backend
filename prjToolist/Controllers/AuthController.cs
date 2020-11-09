@@ -100,9 +100,10 @@ namespace prjToolist.Controllers
             //}
             int userlogin = 0;
             // userlogin = (new UserController()).userIsLoginCookie(userlogin);
-            if (userlogin == 0)
+            if (userlogin != 0)
             {
                 // HttpContext.Current.Session["SK_login"] = null;
+                Debug.WriteLine("logout success");
                 result = new
                 {
                     status = 1,
