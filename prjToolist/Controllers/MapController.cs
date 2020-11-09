@@ -11,7 +11,7 @@ namespace prjToolist.Controllers
 {
     //[JwtAuthActionFilter]
     [RoutePrefix("map")]
-    [EnableCors(origins: "http://localhost:8080", headers: "*", methods: "*", SupportsCredentials = true)]
+    [EnableCors(origins: "*", headers: "*", methods: "*", SupportsCredentials = true)]
     public class MapController : ApiController
     {
         FUENMLEntities db = new FUENMLEntities();

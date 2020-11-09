@@ -94,35 +94,101 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-        [Route("get_tag_event")]
+        [Route("get_tag_event_count")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
-        public HttpResponseMessage get_tag_event()
+        public HttpResponseMessage get_tag_event_count()
         {
-            List<vmCountDataValues> vm_userGrowth = new List<vmCountDataValues>();
+            List<vmCountDataValues> vm_tagCountResult = new List<vmCountDataValues>();
+            List<vmCountDataValues> vm_tagEventCount = new List<vmCountDataValues>();
             var result = new
             {
                 status = 0,
                 msg = "fail",
-                data = vm_userGrowth
+                data = vm_tagCountResult
 
             };
-            var userGrowthPerDay = (from u in db.users
-                                    group u by (u.created.HasValue ? u.created.ToString().Substring(0, 10) : "noDateInfo") into g
-                                    select new vmCountDataValues { key = g.Key, count = g.Count() }).ToList();
+            var tagEventCountTop = (from te in db.tagEvents
+                                    where te.tagEvent1==1|| te.tagEvent1 == 3
+                                    group te by (te.tag_id) into g 
+                                    select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).ToList();
+                                    
 
-            if (userGrowthPerDay != null)
+            if (tagEventCountTop != null)
             {
+                foreach (var tagItem in tagEventCountTop)
+                {
+                    int tagid;
+                    int.TryParse(tagItem.key, out tagid);
+                    var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
+                    if (hasTag != null)
+                    {
+                        vmCountDataValues r = new vmCountDataValues();
+                        r.key = hasTag;
+                        r.count = tagItem.count;
+                        vm_tagCountResult.Add(r);
+                    }
+                }
                 result = new
                 {
                     status = 1,
                     msg = "OK",
-                    data = userGrowthPerDay
+                    data = vm_tagCountResult
 
                 };
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
+
+        [Route("get_place_tag_count")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_place_tag_count()
+        {
+            List<vmCountDataValues> vm_placetagCount = new List<vmCountDataValues>();
+            List<vmCountDataValues> vm_placetagCountResult = new List<vmCountDataValues>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = vm_placetagCountResult
+            };
+            var tagPlaceTop10 = (from topPlace in db.tagRelationships
+                                 group topPlace by (topPlace.place_id.ToString()) into g
+                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(10);
+
+            if (tagPlaceTop10 != null)
+            {
+                foreach (var placeItem in tagPlaceTop10)
+                {
+                    int placeid;
+                    int.TryParse(placeItem.key, out placeid);
+                    var hasPlace = db.places.Where(p => p.id == placeid).Select(q => q.name).FirstOrDefault();
+                    if (hasPlace != null)
+                    {
+                        vmCountDataValues r = new vmCountDataValues();
+                        r.key = hasPlace;
+                        r.count = placeItem.count;
+                        vm_placetagCountResult.Add(r);
+                    }
+                }
+
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = vm_placetagCountResult
+
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+
+
+
+
+
 
         [Route("get_user_list")]
         [HttpPost]

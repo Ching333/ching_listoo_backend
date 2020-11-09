@@ -466,6 +466,7 @@ namespace prjToolist.Controllers
                         {
                             newListPlaces.placelist_id = listId;
                             newListPlaces.place_id = i;
+                            newListPlaces.created = DateTime.Now;
 
                             db.placeRelationships.Add(newListPlaces);
                             db.SaveChanges();
