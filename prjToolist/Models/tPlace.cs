@@ -41,7 +41,7 @@ namespace prjToolist.Models
         public int privacy { get; set; }
         public string createdTime { get; set; }
         public string updatedTime { get; set; }
-        public string cover { get; set; }
+        public string coverImageURL { get; set; }
     }
 
     //for common/get_list_detail
@@ -71,6 +71,7 @@ namespace prjToolist.Models
     //for query/get_place_selectoin
     public class placeSelection
     {
+        public int place_id { get; set; }
         public string name { get; set; }
     }
 

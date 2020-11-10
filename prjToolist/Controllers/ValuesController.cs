@@ -109,10 +109,10 @@ namespace prjToolist.Controllers
 
             };
             var tagEventCountTop = (from te in db.tagEvents
-                                    where te.tagEvent1==1|| te.tagEvent1 == 3
-                                    group te by (te.tag_id) into g 
+                                    where te.tagEvent1 == 1 || te.tagEvent1 == 3
+                                    group te by (te.tag_id) into g
                                     select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).ToList();
-                                    
+
 
             if (tagEventCountTop != null)
             {
@@ -198,8 +198,8 @@ namespace prjToolist.Controllers
                 data = vm_placetagCountResult
             };
             var tagPlaceTop10each = (from topPlace in db.tagRelationships
-                                 group topPlace by new { placeid=topPlace.place_id.ToString(), tagid=topPlace.tag_id.ToString() } into g
-                                 select new vmCountDataValuesTwoKey { key = g.Key.placeid,key2= g.Key.tagid, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(10);
+                                     group topPlace by new { placeid = topPlace.place_id.ToString(), tagid = topPlace.tag_id.ToString() } into g
+                                     select new vmCountDataValuesTwoKey { key = g.Key.placeid, key2 = g.Key.tagid, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(10);
 
             if (tagPlaceTop10each != null)
             {
@@ -211,7 +211,7 @@ namespace prjToolist.Controllers
                     int.TryParse(placeItem.key2.ToString(), out tagid);
                     var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
                     var hasPlace = db.places.Where(p => p.id == placeid).Select(q => q.name).FirstOrDefault();
-                    if (hasPlace != null&& hasTag!=null)
+                    if (hasPlace != null && hasTag != null)
                     {
                         vmCountDataValuesTwoKey r = new vmCountDataValuesTwoKey();
                         r.key = hasPlace;
@@ -231,10 +231,6 @@ namespace prjToolist.Controllers
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-
-
-
-
 
         [Route("get_user_list")]
         [HttpPost]
@@ -372,17 +368,31 @@ namespace prjToolist.Controllers
         [EnableCors("*", "*", "*")]
         public HttpResponseMessage getPlaceSelection()
         {
-            string[] placeArray = db.places.Select(p => p.name).ToArray();
-            //List<placeSelection> placesSelectionList = new List<placeSelection>();
-            //foreach(string p in placeArray)
-            //{
-            //    placeSelection placeItem = new placeSelection();
-            //    placeItem.name = p;
-            //    placesSelectionList.Add(placeItem);
-            //}
+            int[] placeArray = db.places.Select(p => p.id).ToArray();
+            List<placeSelection> placesSelectionList = new List<placeSelection>();
+            foreach (int i in placeArray)
+            {
+                var placeModel = db.places.FirstOrDefault(p => p.id == i);
+                placeSelection placeItem = new placeSelection();
+                placeItem.place_id = placeModel.id;
+                placeItem.name = placeModel.name;
+                placesSelectionList.Add(placeItem);
+            }
             var result = new
             {
-                data = placeArray
+                data = placesSelectionList
+            };
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+        [Route("create_list")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage createList(updateMember updateItem)
+        {
+            var result = new
+            {
+                //data = placeArray
             };
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }

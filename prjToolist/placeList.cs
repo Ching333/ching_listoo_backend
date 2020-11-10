@@ -21,6 +21,6 @@ namespace prjToolist
         public int privacy { get; set; }
         public System.DateTime created { get; set; }
         public Nullable<System.DateTime> updated { get; set; }
-        public byte[] cover { get; set; }
+        public string cover { get; set; }
     }
 }

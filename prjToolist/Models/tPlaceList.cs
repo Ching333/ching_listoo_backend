@@ -24,13 +24,13 @@ namespace prjToolist.Models
         public string coverImageURL { get; set; }
     }
 
-    // for common/get_list_info
+    // for user/get_list_info
     public class getPlaceListbyId
     {
         public int list_id { get; set; }
     }
 
-    // for common/get_list_info
+    // for user/get_list_info
     // for common/get_list_detail 
     public class placeListInfo
     {
