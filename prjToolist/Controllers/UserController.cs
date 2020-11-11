@@ -506,7 +506,7 @@ namespace prjToolist.Controllers
                     newList.description = x.description;
                     newList.privacy = x.privacy;
                     newList.created = DateTime.Now;
-
+                    newList.updated = DateTime.Now;
                     db.placeLists.Add(newList);
                     db.SaveChanges();
                     //listId = int.Parse(db.placeLists.OrderByDescending(p => p.id).Take(1).ToString());
@@ -580,7 +580,7 @@ namespace prjToolist.Controllers
             {
                 try
                 {
-                    //list.cover = byte[];
+                    list.cover = vm_setListCover.cover_image_url;
                     db.SaveChanges();
                 }
                 catch (Exception ex)
@@ -644,7 +644,8 @@ namespace prjToolist.Controllers
                     {
                         vm_pocketPlaceInfo.text = vm_pocketPlaceInfo.text.Trim();
                     }
-                    intersectResult = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.place_id).ToList();
+                    //intersectResult = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.place_id).ToList();
+                    intersectResult = db.places.Select(q => q.id).OrderBy(p=>p).ToList();
                     intersectResult = intersectResult.Distinct().ToList();
                     if (placeInListResult.Count > 0)
                     {
@@ -1133,6 +1134,8 @@ namespace prjToolist.Controllers
                 if (tTagEvent.action == 1 || tTagEvent.action == 2)
                 {
                     if (userlogin == 0) { userlogin = 2; }
+                    var hasTag = db.tags.FirstOrDefault(p => p.id == tTagEvent.tag_id);
+                    if (hasTag != null) { 
                     tagEvent newEvent = new tagEvent();
                     newEvent.tag_id = tTagEvent.tag_id;
                     newEvent.user_id = userlogin;
@@ -1146,6 +1149,7 @@ namespace prjToolist.Controllers
                         status = 1,
                         msg = "",
                     };
+                    }
                 }
             }
             return Request.CreateResponse(HttpStatusCode.OK, result);
@@ -1161,7 +1165,7 @@ namespace prjToolist.Controllers
                 status = 0,
                 msg = "fail",
             };
-
+            string photoUrl = "";
             var httpRequest = HttpContext.Current.Request;
             try
             {
@@ -1173,14 +1177,16 @@ namespace prjToolist.Controllers
                         var postedFile = httpRequest.Files[file];
                         FileInfo uploadfile = new FileInfo(postedFile.FileName);
                         string photoName = Guid.NewGuid().ToString() + uploadfile.Extension;
-                        var filePath = HttpContext.Current.Server.MapPath("~/Storage/upload/" + photoName);
+                        var filePath = HttpContext.Current.Server.MapPath("~/images/" + photoName);
                         postedFile.SaveAs(filePath);
+                        Debug.WriteLine(filePath);
                         docfiles.Add(filePath);
+                        photoUrl = "images/" + photoName;
                     }
                     result = new
                     {
                         status = 1,
-                        msg = "上傳成功",
+                        msg = photoUrl,
                     };
                 }
             }

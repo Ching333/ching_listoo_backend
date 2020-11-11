@@ -19,7 +19,39 @@ namespace prjToolist.Controllers
     {
         private readonly FUENMLEntities db = new FUENMLEntities();
         public int str { get; set; }
+        [Route("get_all_data_count")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_all_data_count()
+        {
+            List<int> allDataCount = new List<int>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = allDataCount
 
+            };
+            
+            int userCount = db.users.Count();
+            int listCount=db.placeLists.Count();
+            int placeCount = db.places.Count();
+            int tagCount = db.tags.Count();
+            if (userCount != 0) { 
+            allDataCount.Add(userCount);
+            allDataCount.Add(listCount);
+            allDataCount.Add(placeCount);
+            allDataCount.Add(tagCount);
+            result = new
+            {
+                status = 1,
+                msg = "OK",
+                data = allDataCount
+
+            };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
         [Route("get_user_growth")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
@@ -111,7 +143,7 @@ namespace prjToolist.Controllers
             var tagEventCountTop = (from te in db.tagEvents
                                     where te.tagEvent1 == 1 || te.tagEvent1 == 3
                                     group te by (te.tag_id) into g
-                                    select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).ToList();
+                                    select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(5);
 
 
             if (tagEventCountTop != null)
@@ -155,7 +187,7 @@ namespace prjToolist.Controllers
             };
             var tagPlaceTop10 = (from topPlace in db.tagRelationships
                                  group topPlace by (topPlace.place_id.ToString()) into g
-                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(10);
+                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(5);
 
             if (tagPlaceTop10 != null)
             {

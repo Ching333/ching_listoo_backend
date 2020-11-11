@@ -34,7 +34,7 @@ namespace prjToolist.Controllers
             var mapInfo = new
             {
                 marks = Marks,
-                systemtags = systemTagResult,
+                system_tags = systemTagResult,
                 user_tags = resultTagInfo
             };
             var result = new
@@ -93,7 +93,7 @@ namespace prjToolist.Controllers
                 mapInfo = new
                 {
                     marks = Marks,
-                    systemtags = systemTagResult,
+                    system_tags = systemTagResult,
                     user_tags = resultTagInfo
                 };
                 result = new
