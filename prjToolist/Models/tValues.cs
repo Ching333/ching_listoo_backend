@@ -23,4 +23,8 @@ namespace prjToolist.Models
         public int tagId { get; set; }
         public string tagName { get; set; }
     }
+    public class vmCountSendEmail
+    {
+        public string toEmail { get; set; }
+    }
 }

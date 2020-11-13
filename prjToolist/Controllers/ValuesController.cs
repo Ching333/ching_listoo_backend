@@ -7,6 +7,8 @@ using System.Web.Http;
 using System.Web.Http.Cors;
 using Newtonsoft.Json.Linq;
 using prjToolist.Models;
+using System.Net;
+using System.Net.Mail;
 using static prjToolist.Models.tagFactory;
 //using static prjToolist.Models.tagFactory;
 //using static prjToolist.Models.tTagRelation.tagFactory;
@@ -19,6 +21,89 @@ namespace prjToolist.Controllers
     {
         private readonly FUENMLEntities db = new FUENMLEntities();
         public int str { get; set; }
+
+        [Route("send_email_test")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage send_email_test(vmCountSendEmail someoneEmail)
+        {
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+            };
+
+            if (someoneEmail != null && someoneEmail.toEmail != "")
+            {
+                //設定smtp主機
+                string smtpAddress = "smtp.gmail.com";
+                //設定Port
+                int portNumber = 587;
+                bool enableSSL = true;
+                //填入寄送方email和密碼
+                string emailFrom = "khito.co@gmail.com";
+                string password = "khitokhitokhito";
+                //收信方email
+                string emailTo = someoneEmail.toEmail;
+                //主旨
+                string subject = "[Khito]系統通知:您的帳戶已由管理員變更權限";
+                //內容
+                string body =
+                @"您好:
+                      由於您的帳戶違反使用規定，因此此帳戶已被限制權限。
+                      若造成您的困擾，深感抱歉，若有任何問題可回覆信件取得協助!
+                      再次感謝您使用Khito服務!
+                                                                        Khito團隊";
+                try
+                {
+                    if (emailTo != null)
+                    {
+                        using (MailMessage mail = new MailMessage())
+                        {
+                            mail.From = new MailAddress(emailFrom);
+
+                            mail.To.Add(emailTo);
+                            mail.Subject = subject;
+                            mail.Body = body;
+                            // 若你的內容是HTML格式，則為True
+                            mail.IsBodyHtml = false;
+
+                            //夾帶檔案
+                            //mail.Attachments.Add(new Attachment("C:\\SomeFile.txt"));
+                            //mail.Attachments.Add(new Attachment("C:\\SomeZip.zip"));
+
+                            using (SmtpClient smtp = new SmtpClient(smtpAddress, portNumber))
+                            {
+                                smtp.Credentials = new NetworkCredential(emailFrom, password);
+                                smtp.EnableSsl = enableSSL;
+                                smtp.Send(mail);
+                                result = new
+                                {
+                                    status = 1,
+                                    msg = "Email success",
+                                };
+                            }
+                        }
+
+
+                    }
+                }
+                catch (Exception ex)
+                {
+                    result = new
+                    {
+                        status = 0,
+                        msg = "Email invalid",
+                    };
+                    return Request.CreateResponse(HttpStatusCode.OK, result);
+                }
+
+
+            }
+
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
         [Route("get_all_data_count")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
@@ -105,7 +190,8 @@ namespace prjToolist.Controllers
                 {
                     int tagid;
                     int.TryParse(tagItem.key, out tagid);
-                    var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
+                    var hasTag = db.tags.Where(p => p.id == tagid && p.type == 2).Select(q => q.name).FirstOrDefault();
+                    //var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
                     if (hasTag != null)
                     {
                         vmCountDataValues r = new vmCountDataValues();
@@ -143,7 +229,7 @@ namespace prjToolist.Controllers
             var tagEventCountTop = (from te in db.tagEvents
                                     where te.tagEvent1 == 1 || te.tagEvent1 == 3
                                     group te by (te.tag_id) into g
-                                    select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(5);
+                                    select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).OrderByDescending(g1 => g1.count).ToList();
 
 
             if (tagEventCountTop != null)
@@ -152,7 +238,8 @@ namespace prjToolist.Controllers
                 {
                     int tagid;
                     int.TryParse(tagItem.key, out tagid);
-                    var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
+                    //var hasTag = db.tags.Where(p => p.id == tagid).Select(q => q.name).FirstOrDefault();
+                    var hasTag = db.tags.Where(p => p.id == tagid && p.type == 2).Select(q => q.name).FirstOrDefault();
                     if (hasTag != null)
                     {
                         vmCountDataValues r = new vmCountDataValues();
