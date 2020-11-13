@@ -890,8 +890,8 @@ namespace prjToolist.Controllers
                     place np = new place();
                     np.gmap_id = newPlace.gmap_id;
                     np.name = newPlace.name;
-                    np.latitude = newPlace.latitude;
-                    np.longitude = newPlace.longitude;
+                    np.latitude = newPlace.lat;
+                    np.longitude = newPlace.lon;
                     np.phone = newPlace.phone;
                     np.address = newPlace.address;
                     np.type = newPlace.type;

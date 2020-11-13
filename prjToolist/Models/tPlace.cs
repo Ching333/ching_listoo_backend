@@ -19,8 +19,8 @@ namespace prjToolist.Models
     public class addNewPlaceInfo
     {
         public string gmap_id { get; set; }
-        public decimal longitude { get; set; }
-        public decimal latitude { get; set; }
+        public decimal lon { get; set; }
+        public decimal lat { get; set; }
         public string name { get; set; }
         public string phone { get; set; }
         public string address { get; set; }
