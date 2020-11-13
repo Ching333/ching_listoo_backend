@@ -883,7 +883,20 @@ namespace prjToolist.Controllers
             };
             if (newPlace.gmap_id != null) { 
             var hasPlace = db.places.FirstOrDefault(p => p.gmap_id == newPlace.gmap_id);
-            if (hasPlace == null)
+            if(hasPlace != null)
+                {
+                    dataForm = new
+                    {
+                        place_id = hasPlace.id
+                    };
+                    result = new
+                    {
+                        status = 1,
+                        msg = "資料庫已有此地點",
+                        data = dataForm
+                    };
+                }
+            else if (hasPlace == null)
             {
                 try
                 {

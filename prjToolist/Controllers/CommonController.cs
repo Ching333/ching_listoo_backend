@@ -291,7 +291,7 @@ namespace prjToolist.Controllers
                         placeDetail.phone = placeItem.phone;
                         placeDetail.address = placeItem.address;
                         placeDetail.type = placeItem.type;
-                        //placeDetail.photo_url = placeItem.photo.ToString(); // photo type in db is byte[]
+                        placeDetail.photo_url = placeItem.photo!=null? placeItem.photo:null; // photo type in db is byte[]
                         resultPlaceInfo.Add(placeDetail);
                     }
                     tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == i && p.user_id == list_createrId).Select(q => q.tag_id).ToList());
