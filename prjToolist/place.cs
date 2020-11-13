@@ -22,6 +22,6 @@ namespace prjToolist
         public string address { get; set; }
         public string type { get; set; }
         public string gmap_id { get; set; }
-        public byte[] photo { get; set; }
+        public string photo { get; set; }
     }
 }

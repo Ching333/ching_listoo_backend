@@ -60,6 +60,7 @@ namespace prjToolist.Models
     public class tTagRelaforTable
     {
         public int id { get; set; }
+        public int place_id { get; set; }
         public string place_name { get; set; }
         public string tag_name { get; set; }
         public string user_name { get; set; }
@@ -110,8 +111,9 @@ namespace prjToolist.Models
                         newtag.type = 2;
                         db.tags.Add(newtag);
                         db.SaveChanges();
+                        tag_id.AddRange(db.tags.Where(p => p.name == trimString).Select(q => q.id).ToList());
                     }
-                    tag_id.AddRange(db.tags.Where(p => p.name == trimString).Select(q => q.id).ToList());
+                    
                 }
             }
             return tag_id.Distinct().ToArray();

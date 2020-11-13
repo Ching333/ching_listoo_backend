@@ -17,4 +17,10 @@ namespace prjToolist.Models
         public string key { get; set; }
         public string key2 { get; set; }
     }
+
+    public class tagSelection
+    {
+        public int tagId { get; set; }
+        public string tagName { get; set; }
+    }
 }

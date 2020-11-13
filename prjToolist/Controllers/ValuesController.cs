@@ -311,10 +311,11 @@ namespace prjToolist.Controllers
                 var placeItem = db.places.AsEnumerable().FirstOrDefault(p => p.id == tag_List[i].place_id);
                 var tagItem = db.tags.AsEnumerable().FirstOrDefault(t => t.id == tag_List[i].tag_id);
                 var userItem = db.users.AsEnumerable().FirstOrDefault(u => u.id == tag_List[i].user_id);
+                int placeId = placeItem.id;
                 string placeName = placeItem.name;
                 string tagName = tagItem.name;
                 string userName = userItem.name;
-
+                
                 tTagRelaforTable listItem = new tTagRelaforTable();
                 listItem.id = i + 1;
                 listItem.place_name = placeName;
@@ -416,7 +417,28 @@ namespace prjToolist.Controllers
             };
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
-
+        [Route("get_tag_selection")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage getTagSelection()
+        {
+            int[] tagArray = db.tags.Select(t => t.id).ToArray();
+            Array.Sort(tagArray);
+            List<tagSelection> tagSelectionList = new List<tagSelection>();
+            foreach (int i in tagArray)
+            {
+                var tagModel = db.tags.FirstOrDefault(t => t.id == i);
+                tagSelection tagItem = new tagSelection();
+                tagItem.tagName = tagModel.name;
+                tagItem.tagId = tagModel.id;
+                tagSelectionList.Add(tagItem);
+            }
+            var result = new
+            {
+                data = tagSelectionList
+            };
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
         [Route("create_list")]
         [HttpPost]
         [EnableCors("*", "*", "*")]

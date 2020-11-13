@@ -11,36 +11,38 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 
-    /************************************/
-    /*   user/{apicontroller}           */
-    /*                                  */
-    /*   --/user/get_user_places/       */
-    /*   |                              */
-    /*   --/user/get_user_lists/        */
-    /*   |                              */
-    /*   --/user/get_list_info/         */
-    /*   |                              */
-    /*   --/user/create_list/           */
-    /*   |                              */
-    /*   --/user/set_list_cover/        */
-    /*   |                              */
-    /*   --/user/search_user_places/    */
-    /*   |                              */
-    /*   --/user/add_list_places/       */
-    /*   |                              */
-    /*   --/user/remove_list_places/    */
-    /*   |                              */
-    /*   --/user/edit_list/             */
-    /*   |                              */
-    /*   --/user/modify_place_tag/      */
-    /*   |                              */
-    /*   --/user/search_tag/            */
-    /*   |                              */
-    /*   --/user/get_place_tags/        */
-    /*   |                              */
-    /*   --/user/send_tag_event/        */
-    /*                                  */
-    /************************************/
+/************************************/
+/*   user/{apicontroller}           */
+/*                                  */
+/*   --/user/get_user_places/       */
+/*   |                              */
+/*   --/user/get_user_lists/        */
+/*   |                              */
+/*   --/user/get_list_info/         */
+/*   |                              */
+/*   --/user/create_list/           */
+/*   |                              */
+/*   --/user/set_list_cover/        */
+/*   |                              */
+/*   --/user/search_user_places/    */
+/*   |                              */
+/*   --/user/add_list_places/       */
+/*   |                              */
+/*   --/user/remove_list_places/    */
+/*   |                              */
+/*   --/user/edit_list/             */
+/*   |                              */
+/*   --/user/add_new_place          */
+/*   |                              */
+/*   --/user/modify_place_tag/      */
+/*   |                              */
+/*   --/user/search_tag/            */
+/*   |                              */
+/*   --/user/get_place_tags/        */
+/*   |                              */
+/*   --/user/send_tag_event/        */
+/*                                  */
+/************************************/
 
 namespace prjToolist.Controllers
 {
@@ -129,7 +131,8 @@ namespace prjToolist.Controllers
                             placeModel.type = placeItem.type;
                             placeModel.longitude = placeItem.longitude;
                             placeModel.latitude = placeItem.latitude;
-                            placeModel.photo_url = "";
+                            //placeModel.photo_url = "";
+                            placeModel.photo_url = placeItem.photo != null ? placeItem.photo : "";
                             resultPlaceInfo.Add(placeModel);
                         }
                         tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == i && p.user_id == userlogin).Select(q => q.tag_id).ToList());
@@ -383,7 +386,8 @@ namespace prjToolist.Controllers
                             infoItem.privacy = li.privacy;
                             infoItem.createdTime = li.created != null ? li.created.ToString().Substring(0, 10) : "";
                             infoItem.updatedTime = li.updated != null ? li.updated.ToString().Substring(0, 10) : "";
-                            infoItem.coverImageURL = li.cover;
+                            //infoItem.coverImageURL = li.cover;
+                            infoItem.coverImageURL = li.cover != null ? li.cover : "";
                             //byte[] binaryString = (byte[])place.cover;
                             //info.cover = Encoding.UTF8.GetString(binaryString);
                             infoList.Add(infoItem);
@@ -670,7 +674,7 @@ namespace prjToolist.Controllers
                                 placeinfo.phone = pocketPlace.phone;
                                 placeinfo.address = pocketPlace.address;
                                 placeinfo.type = pocketPlace.type;
-                                placeinfo.photo_url = "";
+                                placeinfo.photo_url = pocketPlace.photo!=null? pocketPlace.photo:"";
                                 resultPlaceInfo.Add(placeinfo);
                             }
                         }
@@ -862,6 +866,72 @@ namespace prjToolist.Controllers
           );
             return resp;
         }
+        [Route("add_new_place")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage add_new_place(addNewPlaceInfo newPlace)
+        {   int placeId = 0;
+            var dataForm = new
+            {
+                place_id = placeId
+            };
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = dataForm
+            };
+            if (newPlace.gmap_id != null) { 
+            var hasPlace = db.places.FirstOrDefault(p => p.gmap_id == newPlace.gmap_id);
+            if (hasPlace == null)
+            {
+                try
+                {
+                    place np = new place();
+                    np.gmap_id = newPlace.gmap_id;
+                    np.name = newPlace.name;
+                    np.latitude = newPlace.latitude;
+                    np.longitude = newPlace.longitude;
+                    np.phone = newPlace.phone;
+                    np.address = newPlace.address;
+                    np.type = newPlace.type;
+                    np.photo = newPlace.photo_url;
+                    db.places.Add(np);
+                    db.SaveChanges();
+                    var newplace = db.places.FirstOrDefault(p => p.gmap_id == newPlace.gmap_id);
+                        if (newplace!=null)
+                        {
+                            placeId = newplace.id;
+                        }
+                        dataForm = new
+                        {
+                            place_id = placeId
+                        };
+                        result = new
+                        {
+                            status = 1,
+                            msg = "地點新增成功",
+                            data = dataForm
+                        };
+                }
+                catch {
+
+                    result = new
+                    {
+                        status = 0,
+                        msg = "地點新增失敗，資訊欄不完整或有誤",
+                        data = dataForm
+                    };
+                    
+                }
+               
+            }}
+           
+            var resp = Request.CreateResponse(HttpStatusCode.OK,result);
+         
+            return resp;
+
+        }
 
         [Route("modify_place_tag")]
         [HttpPost]
@@ -889,7 +959,7 @@ namespace prjToolist.Controllers
                     foreach (var i in vm_tagChange.add)
                     {
                         var hastag = db.tags.Where(p => p.id == i).Any();
-                        var placehastag = db.tagRelationships.Where(p => p.tag_id == i && p.place_id == place.id).Any();
+                        var placehastag = db.tagRelationships.Where(p => p.tag_id == i && p.place_id == place.id && p.user_id == userlogin).Any();
                         if (hastag && !placehastag)
                         {
                             tagRelationship t = new tagRelationship();
@@ -907,6 +977,11 @@ namespace prjToolist.Controllers
                             newEvent.created = DateTime.Now;
                             db.tagEvents.Add(newEvent);
                             db.SaveChanges();
+                            result = new
+                            {
+                                status = 1,
+                                msg = "OK",
+                            };
                         }
                     }
                 }
@@ -915,7 +990,7 @@ namespace prjToolist.Controllers
                     foreach (var j in vm_tagChange.remove)
                     {
                         var hastag = db.tags.Where(p => p.id == j).Any();
-                        var d = db.tagRelationships.Where(p => p.place_id == place.id && p.tag_id == j).Select(q => q).FirstOrDefault();
+                        var d = db.tagRelationships.Where(p => p.place_id == place.id && p.tag_id == j && p.user_id == userlogin).Select(q => q).FirstOrDefault();
                         if (hastag && d != null)
                         {
                             db.tagRelationships.Remove(d);
@@ -928,7 +1003,11 @@ namespace prjToolist.Controllers
                             newEvent.created = DateTime.Now;
                             db.tagEvents.Add(newEvent);
                             db.SaveChanges();
-
+                            result = new
+                            {
+                                status = 1,
+                                msg = "OK",
+                            };
                         }
                     }
                 }
@@ -948,19 +1027,15 @@ namespace prjToolist.Controllers
                             db.tagRelationships.Add(t);
                             db.SaveChanges();
                         }
+                        result = new
+                        {
+                            status = 1,
+                            msg = "OK",
+                        };
                     }
                 }
-
-                result = new
-                {
-                    status = 1,
-                    msg = "OK",
-                };
             }
-            var resp = Request.CreateResponse(
-          HttpStatusCode.OK,
-          result
-          );
+            var resp = Request.CreateResponse(HttpStatusCode.OK, result);
             return resp;
         }
 

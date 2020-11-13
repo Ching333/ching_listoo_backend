@@ -78,7 +78,8 @@ namespace prjToolist.Controllers
                     placeListItem.id = placeListModel.id;
                     placeListItem.creator_id = placeListModel.user_id;
                     placeListItem.name = placeListModel.name;
-                    placeListItem.coverImageURL = placeListModel.cover;
+                    //placeListItem.coverImageURL = placeListModel.cover;
+                    placeListItem.coverImageURL = placeListModel.cover != null ? placeListModel.cover : "";
                     placeList.Add(placeListItem);
                 }
                 if (tagIDList.Count > 0)
@@ -121,7 +122,8 @@ namespace prjToolist.Controllers
                         placeListItem.id = placeListModel.id;
                         placeListItem.creator_id = placeListModel.user_id;
                         placeListItem.name = placeListModel.name;
-                        placeListItem.coverImageURL = placeListModel.cover;
+                        //placeListItem.coverImageURL = placeListModel.cover;
+                        placeListItem.coverImageURL = placeListModel.cover != null ? placeListModel.cover : "";
                         placeList.Add(placeListItem);
                     }
                 }
