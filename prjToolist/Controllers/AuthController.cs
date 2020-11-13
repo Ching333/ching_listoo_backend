@@ -48,19 +48,34 @@ namespace prjToolist.Controllers
                 };
                 if (verifyAccount != null)
                 {
-                    HttpContext.Current.Session["SK_login"] = verifyAccount;
+                        HttpContext.Current.Session["SK_login"] = verifyAccount;
 
-                    resultUsername = new
+                        resultUsername = new
+                        {
+                            username = verifyAccount.name,
+                            user_id = verifyAccount.id.ToString()
+                        };
+                        result = new
+                        {
+                            status = 1,
+                            msg = "",
+                            data = resultUsername
+                        };
+
+                    if (verifyAccount.authority == 2)
                     {
-                        username = verifyAccount.name,
-                        user_id = verifyAccount.id.ToString()
-                    };
-                    result = new
-                    {
-                        status = 1,
-                        msg = "",
-                        data = resultUsername
-                    };
+                        resultUsername = new
+                        {
+                            username = "",
+                            user_id = ""
+                        };
+                        result = new
+                        {
+                            status = 0,
+                            msg = "此帳戶已由管理員限制權限",
+                            data = resultUsername
+                        };
+                    }
                     //resp.Headers.AddCookies(new CookieHeaderValue[] { cookie });
                     //resp.RequestMessage.Content = result;
                     //var reqResult = Request.CreateResponse(HttpStatusCode.OK, result);

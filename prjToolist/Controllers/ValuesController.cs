@@ -97,7 +97,7 @@ namespace prjToolist.Controllers
             };
             var tagCountTop10 = (from topTag in db.tagRelationships
                                  group topTag by (topTag.tag_id.ToString()) into g
-                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(10);
+                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList();
 
             if (tagCountTop10 != null)
             {
@@ -187,7 +187,7 @@ namespace prjToolist.Controllers
             };
             var tagPlaceTop10 = (from topPlace in db.tagRelationships
                                  group topPlace by (topPlace.place_id.ToString()) into g
-                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList().Take(5);
+                                 select new vmCountDataValues { key = g.Key, count = g.Count() }).OrderByDescending(g1 => g1.count).ToList();
 
             if (tagPlaceTop10 != null)
             {
