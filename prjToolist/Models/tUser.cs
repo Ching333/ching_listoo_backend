@@ -31,6 +31,8 @@ namespace prjToolist.Models
         public string password { get; set; }
     }
 
+   
+
     public class updateMember
     {
         public int id { get; set; }

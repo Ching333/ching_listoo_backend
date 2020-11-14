@@ -41,7 +41,8 @@ using System.Web.Http.Cors;
 /*   --/user/get_place_tags/        */
 /*   |                              */
 /*   --/user/send_tag_event/        */
-/*                                  */
+/*   |                              */
+/*   --/user/invite_edit_together/  */
 /************************************/
 
 namespace prjToolist.Controllers
@@ -1243,6 +1244,53 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+
+        [Route("invite_edit_together")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage invite_edit_together(vmInvitedEmail vmEmail)
+        {
+            var dataForm = new
+            {
+                username = "",
+                user_id = ""
+            };
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data= dataForm
+            };
+            if (vmEmail.invitedEmail != null)
+            {
+                result = new
+                {
+                    status = 0,
+                    msg = vmEmail.invitedEmail+" 輸入值非有效會員",
+                    data = dataForm
+                };
+                vmEmail.invitedEmail = vmEmail.invitedEmail.Trim();
+                var hasUser = db.users.FirstOrDefault(p => p.email == vmEmail.invitedEmail);
+                if (hasUser != null)
+                {
+                    dataForm = new
+                    {
+                        username = hasUser.name,
+                        user_id = hasUser.id.ToString()
+                    };
+                    result = new
+                    {
+                        status = 1,
+                        msg = "success",
+                        data = dataForm
+                    };
+                }
+            }
+            var resp = Request.CreateResponse(HttpStatusCode.OK, result);
+            return resp;
+
+        }
+
         [Route("save_list_photo")]
         [HttpPost]
         [EnableCors("*", "*", "*")]
@@ -1287,11 +1335,7 @@ namespace prjToolist.Controllers
                     msg = "檔案大小超過限制",
                 };
             }
-
-            var resp = Request.CreateResponse(
-          HttpStatusCode.OK,
-          result
-          );
+            var resp = Request.CreateResponse(HttpStatusCode.OK,result);
             return resp;
         }
 

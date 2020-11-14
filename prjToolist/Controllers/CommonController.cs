@@ -245,7 +245,7 @@ namespace prjToolist.Controllers
                 infoItem.privacy = listModel.privacy;
                 infoItem.createdTime = listModel.created != null ? listModel.created.ToString().Substring(0, 10) : "";
                 infoItem.updatedTime = listModel.updated != null ? listModel.updated.ToString().Substring(0, 10) : "";
-
+                infoItem.coverImageURL = listModel.cover != null ? listModel.cover : null;
                 dataForm = new
                 {
                     info = infoItem,

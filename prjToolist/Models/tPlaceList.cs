@@ -102,4 +102,10 @@ namespace prjToolist.Models
         public string createdTime { get; set; }
         public string updatedTime { get; set; }
     }
+    //for user/invite_edit_together
+    public class vmInvitedEmail
+    {
+        //public int list_id { get; set; }
+        public string invitedEmail { get; set; }
+    }
 }
