@@ -27,6 +27,7 @@ namespace prjToolist
     
         public virtual DbSet<place> places { get; set; }
         public virtual DbSet<placeList> placeLists { get; set; }
+        public virtual DbSet<placeListRelationship> placeListRelationships { get; set; }
         public virtual DbSet<placeRelationship> placeRelationships { get; set; }
         public virtual DbSet<tag> tags { get; set; }
         public virtual DbSet<tagEvent> tagEvents { get; set; }

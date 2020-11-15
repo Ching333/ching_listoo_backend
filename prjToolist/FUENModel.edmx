@@ -32,6 +32,15 @@
           <Property Name="updated" Type="datetime" />
           <Property Name="cover" Type="nvarchar(max)" />
         </EntityType>
+        <EntityType Name="placeListRelationship">
+          <Key>
+            <PropertyRef Name="placelist_id" />
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="placelist_id" Type="int" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="created" Type="datetime" />
+        </EntityType>
         <EntityType Name="placeRelationship">
           <Key>
             <PropertyRef Name="place_id" />
@@ -85,6 +94,7 @@
         <EntityContainer Name="FUENMLModelStoreContainer">
           <EntitySet Name="place" EntityType="Self.place" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="placeList" EntityType="Self.placeList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="placeListRelationship" EntityType="Self.placeListRelationship" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="placeRelationship" EntityType="Self.placeRelationship" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tag" EntityType="Self.tag" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tagEvent" EntityType="Self.tagEvent" Schema="dbo" store:Type="Tables" />
@@ -98,6 +108,7 @@
         <EntityContainer Name="FUENMLEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="places" EntityType="FUENMLModel.place" />
           <EntitySet Name="placeLists" EntityType="FUENMLModel.placeList" />
+          <EntitySet Name="placeListRelationships" EntityType="FUENMLModel.placeListRelationship" />
           <EntitySet Name="placeRelationships" EntityType="FUENMLModel.placeRelationship" />
           <EntitySet Name="tags" EntityType="FUENMLModel.tag" />
           <EntitySet Name="tagEvents" EntityType="FUENMLModel.tagEvent" />
@@ -130,6 +141,15 @@
           <Property Name="created" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="updated" Type="DateTime" Precision="3" />
           <Property Name="cover" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <EntityType Name="placeListRelationship">
+          <Key>
+            <PropertyRef Name="placelist_id" />
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="placelist_id" Type="Int32" Nullable="false" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="created" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="placeRelationship">
           <Key>
@@ -213,6 +233,15 @@
                 <ScalarProperty Name="name" ColumnName="name" />
                 <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="placeListRelationships">
+            <EntityTypeMapping TypeName="FUENMLModel.placeListRelationship">
+              <MappingFragment StoreEntitySet="placeListRelationship">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="placelist_id" ColumnName="placelist_id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

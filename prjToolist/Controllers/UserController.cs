@@ -215,6 +215,7 @@ namespace prjToolist.Controllers
                 List<int> placesList = new List<int>();
                 List<int> tagsList = new List<int>();
                 List<int> intersectResult = new List<int>();
+                List<int> editorIdList = new List<int>();
                 List<tTag> resultTagInfo = new List<tTag>();
                 List<userListInfo> infoList = new List<userListInfo>();
                 //if (HttpContext.Current.Session["SK_login"] != null)
@@ -231,7 +232,9 @@ namespace prjToolist.Controllers
                     lists = infoList,
                     user_tags = resultTagInfo,
                     // places = intersectResult,
-                    system_tags = systemTagResult
+                    system_tags = systemTagResult,
+                    editors_id= editorIdList
+
                 };
 
                 var result = new
@@ -244,11 +247,22 @@ namespace prjToolist.Controllers
                 if (userlogin != 0)
                 {
                     userList = db.placeLists.Where(p => p.user_id == userlogin).Select(q => q.id).ToList();//使用者建立的全部清單
+                    var editList = db.placeListRelationships.Where(p => p.user_id == userlogin).Select(q => q.placelist_id).ToList();//使用者的共編清單
+                    if (editList != null)
+                    {
+                        userList.AddRange(editList);
+                        userList = userList.Distinct().ToList();
+                    }
 
                     if (userList != null)
                     {
                         foreach (int r in userList)
                         {
+                            var editorInList = db.placeListRelationships.Where(p => p.placelist_id == r).Select(q => q.user_id).ToList();
+                            if (editorInList != null)
+                            {
+                                editorIdList.AddRange(editorInList);
+                            }
                             //placeListInfo infoItem = new placeListInfo();
                             //var li = db.placeLists.Where(p => p.id == r && p.user_id == userlogin).Select(q => q).FirstOrDefault();
                             //if (li != null)
@@ -267,6 +281,7 @@ namespace prjToolist.Controllers
                             intersectResult.AddRange(db.placeRelationships.Where(p => p.placelist_id == r).Select(q => q.place_id).ToList());
                         }
                         intersectResult = intersectResult.Distinct().ToList();
+                        editorIdList = editorIdList.Distinct().ToList();
                     }
 
                     dataForm = new
@@ -274,7 +289,8 @@ namespace prjToolist.Controllers
                         lists = infoList,
                         user_tags = resultTagInfo,
                         // places = intersectResult,
-                        system_tags = systemTagResult
+                        system_tags = systemTagResult,
+                        editors_id = editorIdList
                     };
 
                     result = new
@@ -293,6 +309,14 @@ namespace prjToolist.Controllers
                         //var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
                         //searchplacehastag = searchplacehastag.Distinct().ToList();
                         //intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
+                        if (editorIdList.Count > 0)
+                        {
+                            foreach (int editorId in editorIdList)
+                            {
+                                var editTagPlace = db.tagRelationships.Where(p => p.user_id == editorId && p.tag_id == i).Select(q => q.place_id).ToList();
+                                if (editTagPlace != null) { intersectResult.AddRange(editTagPlace); }
+                            }
+                        }
                     }
                     intersectResult = intersectResult.Distinct().ToList();
 
@@ -306,7 +330,8 @@ namespace prjToolist.Controllers
                         lists = infoList,
                         user_tags = resultTagInfo,
                         //places = intersectResult,//地點編號
-                        system_tags = systemTagResult
+                        system_tags = systemTagResult,
+                        editors_id = editorIdList
                     };
 
                     result = new
@@ -360,7 +385,8 @@ namespace prjToolist.Controllers
                         lists = infoList,
                         user_tags = resultTagInfo,
                         //places = intersectResult,//地點編號
-                        system_tags = systemTagResult
+                        system_tags = systemTagResult,
+                        editors_id = editorIdList
                     };
 
                     result = new
@@ -377,7 +403,8 @@ namespace prjToolist.Controllers
                     foreach (int r in userList)
                     {
                         userListInfo infoItem = new userListInfo();
-                        var li = db.placeLists.Where(p => p.id == r && p.user_id == userlogin).Select(q => q).FirstOrDefault();
+                        //var li = db.placeLists.Where(p => p.id == r && p.user_id == userlogin).Select(q => q).FirstOrDefault();
+                        var li = db.placeLists.Where(p => p.id == r ).Select(q => q).FirstOrDefault();
                         if (li != null)
                         {
                             infoItem.id = li.id;
@@ -400,7 +427,8 @@ namespace prjToolist.Controllers
                         lists = infoList,
                         user_tags = resultTagInfo,
                         // places = intersectResult,//地點編號
-                        system_tags = systemTagResult
+                        system_tags = systemTagResult,
+                        editors_id = editorIdList
                     };
 
                     result = new
@@ -436,10 +464,12 @@ namespace prjToolist.Controllers
             userlogin = userFactory.userIsLoginSession(userlogin);
             userlogin = userIsLoginCookie(userlogin);
             placeListInfo infoItem = new placeListInfo();
+            List<string> editorEmailList = new List<string>();
             int list_createrId = 0;
             var listInfo = new
             {
-                info = infoItem
+                info = infoItem,
+                editors_email= editorEmailList
             };
             var result = new
             {
@@ -465,7 +495,30 @@ namespace prjToolist.Controllers
 
                     listInfo = new
                     {
-                        info = infoItem
+                        info = infoItem,
+                        editors_email = editorEmailList
+                    };
+                    result = new
+                    {
+                        status = 1,
+                        msg = "",
+                        data = listInfo
+                    };
+                }
+                var editorInList = db.placeListRelationships.Where(p => p.placelist_id == querybody.list_id).Select(q => q.user_id).ToList();
+                if (editorInList != null)
+                {
+                    foreach(int i in editorInList)
+                    {
+                        var editorEmail = db.users.Where(p => p.id == i).Select(q => q.email).FirstOrDefault();
+                        if (editorEmail != null) {
+                            editorEmailList.Add(editorEmail);
+                        }
+                    }
+                    listInfo = new
+                    {
+                        info = infoItem,
+                        editors_email = editorEmailList
                     };
                     result = new
                     {
@@ -538,6 +591,24 @@ namespace prjToolist.Controllers
                             }
                         }
                     }
+                    //加入共編者Email
+                    if(x.editors_email.Length>0&& listId > 0)
+                    {
+                        foreach (string item in x.editors_email) {
+                            var editorEmail = item.Trim();
+                            var hasEmail = db.users.FirstOrDefault(p => p.email == editorEmail);
+                            if (hasEmail != null)
+                            {
+                                placeListRelationship editTogrther = new placeListRelationship();
+                                editTogrther.user_id = hasEmail.id;
+                                editTogrther.placelist_id = listId;
+                                editTogrther.created = DateTime.Now;
+                                db.placeListRelationships.Add(editTogrther);
+                            }
+
+                        }
+                    }
+                   
                     //listId = listId1[0];
                     //Debug.WriteLine(listId);
                     if (listId > 0)
@@ -845,6 +916,36 @@ namespace prjToolist.Controllers
 
             };
             var list = db.placeLists.Where(p => p.id == vm_editlist.list_id).Select(q => q).FirstOrDefault();
+            if (list != null) { 
+                //共編者全部刪除
+                var editorInList = db.placeListRelationships.Where(q => q.placelist_id == list.id).ToList();
+                if (editorInList != null) { 
+                foreach (placeListRelationship item in editorInList)
+                {
+                        db.placeListRelationships.Remove(item);
+                        db.SaveChanges();
+                }
+                }
+            }
+
+            if (vm_editlist.editors_email.Length > 0 && list!=null)
+            {   //共編者重建
+                foreach (string item in vm_editlist.editors_email)
+                {
+                    var editorEmail = item.Trim();
+                    var hasEmail = db.users.FirstOrDefault(p => p.email == editorEmail);
+                    if (hasEmail != null)
+                    {
+                        placeListRelationship editTogrther = new placeListRelationship();
+                        editTogrther.user_id = hasEmail.id;
+                        editTogrther.placelist_id = list.id;
+                        editTogrther.created = DateTime.Now;
+                        db.placeListRelationships.Add(editTogrther);
+                        db.SaveChanges();
+                    }
+
+                }
+            }
 
             if (list != null && vm_editlist.name != null && vm_editlist.description != null && vm_editlist.privacy != 0)
             {
@@ -1244,7 +1345,7 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
-
+        //TODO 改為方法
         [Route("invite_edit_together")]
         [HttpPost]
         [EnableCors("*", "*", "*")]

@@ -53,6 +53,7 @@ namespace prjToolist.Models
         public int privacy { get; set; }
         //public string coverImageURL { get; set; }
         public int[] places { get; set; }
+        public string[] editors_email { get; set; }
     }
 
     //for user/add_list_places
@@ -68,6 +69,7 @@ namespace prjToolist.Models
         public string name { get; set; }
         public string description { get; set; }
         public int privacy { get; set; }
+        public string[] editors_email { get; set; }
     }
 
     //  for common/get_list_detail
