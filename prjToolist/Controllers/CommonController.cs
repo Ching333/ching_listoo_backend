@@ -52,7 +52,7 @@ namespace prjToolist.Controllers
             int userlogin = 0;
             userFactory.userEventRecord(userlogin, 1, db);
             var entirePlaces = db.places.Select(p => p.id).ToList();
-            var entirePlaceLists = db.placeLists.Select(p => p.id).ToList();
+            var entirePlaceLists = db.placeLists.Where(p=>p.privacy!=2).OrderByDescending(p=>p.privacy).Select(p => p.id).ToList();
             int filterCount = filter.filter.Length;
             intersectPlaceId = entirePlaces;
             intersectPlaceListId = entirePlaceLists;
@@ -75,7 +75,7 @@ namespace prjToolist.Controllers
                 intersectPlaceListId = intersectPlaceListId.Intersect(listFilter).ToList();
                 tagIDList = tagIDList.Distinct().ToList();
                 Array.Sort(tagIDList.ToArray());
-                Array.Sort(intersectPlaceListId.Distinct().ToArray());
+                //Array.Sort(intersectPlaceListId.Distinct().ToArray());
                 foreach(int i in intersectPlaceListId)
                 {
                     var placeListModel = db.placeLists.FirstOrDefault(p => p.id == i);
