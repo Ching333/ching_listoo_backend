@@ -29,6 +29,7 @@ namespace prjToolist.Controllers
             List<int> intersectPlaceListId = new List<int>();
             List<int> allPlaceId = new List<int>();
             List<int> allTagIdInList = new List<int>();
+            List<int>  listFilter= new List<int>();
             int[] tagIdList = db.tags.Select(t => t.id).ToArray();
             //string[] typeList = db.places.Select(p => p.type).Distinct().ToArray();
             Array.Sort(tagIdList);
@@ -66,10 +67,12 @@ namespace prjToolist.Controllers
                 Array.Sort(intersectPlaceId.ToArray());
                 foreach (int i in intersectPlaceId)
                 {
-                    var listFilter = db.placeRelationships.Where(p => p.place_id == i).Select(p => p.placelist_id).ToList();
+                    var listFilterEach = db.placeRelationships.Where(p => p.place_id == i).Select(p => p.placelist_id).ToList();
                     tagIDList.AddRange(db.tagRelationships.Where(p => p.place_id == i).Select(q => q.tag_id).ToList());
-                    intersectPlaceListId = intersectPlaceListId.Intersect(listFilter).ToList();
+                    listFilter = listFilter.Union(listFilterEach).ToList();
                 }
+                listFilter = listFilter.Distinct().ToList();
+                intersectPlaceListId = intersectPlaceListId.Intersect(listFilter).ToList();
                 tagIDList = tagIDList.Distinct().ToList();
                 Array.Sort(tagIDList.ToArray());
                 Array.Sort(intersectPlaceListId.Distinct().ToArray());
@@ -149,12 +152,15 @@ namespace prjToolist.Controllers
                 }
                 foreach (int i in tagIdList)
                 {
-                    var tagModel = db.tags.FirstOrDefault(t => t.id == i);
-                    tTag tagItem = new tTag();
-                    tagItem.id = i;
-                    tagItem.type = tagModel.type;
-                    tagItem.name = tagModel.name;
-                    tagList.Add(tagItem);
+                    var tagModel = db.tags.Where(t => t.id == i&&t.type==2).Select(q=>q).FirstOrDefault();
+                    if (tagModel != null)
+                    {
+                        tTag tagItem = new tTag();
+                        tagItem.id = i;
+                        tagItem.type = tagModel.type;
+                        tagItem.name = tagModel.name;
+                        tagList.Add(tagItem);
+                    }
                 }
                 //typeList = db.places.Select(p => p.type).Distinct().ToArray();
                 //typeList = typeList.Distinct();

@@ -607,6 +607,7 @@ namespace prjToolist.Controllers
                                 editTogrther.placelist_id = listId;
                                 editTogrther.created = DateTime.Now;
                                 db.placeListRelationships.Add(editTogrther);
+                                db.SaveChanges();
                             }
 
                         }

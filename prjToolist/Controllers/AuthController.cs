@@ -71,7 +71,7 @@ namespace prjToolist.Controllers
                         };
                         result = new
                         {
-                            status = 0,
+                            status = 2,
                             msg = "此帳戶已由管理員限制權限",
                             data = resultUsername
                         };
