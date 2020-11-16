@@ -401,6 +401,9 @@
     <Compile Include="user.cs">
       <DependentUpon>FUENModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="userEvent.cs">
+      <DependentUpon>FUENModel.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

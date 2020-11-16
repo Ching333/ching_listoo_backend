@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
@@ -65,6 +66,23 @@ namespace prjToolist.Models
                 userlogin = u.id;
             };
             return userlogin;
+        }
+        public static void userEventRecord( int userlogin,  int userEventNum, FUENMLEntities db)
+        {
+            try {
+                if (userEventNum == 1 || userEventNum == 2 || userEventNum == 3) {
+                    if (userlogin == 0) { userlogin = 2; }
+                    userEvent userEventobj = new userEvent();
+                    userEventobj.user_id = userlogin;
+                    userEventobj.userEvent1 = userEventNum;
+                    userEventobj.created = DateTime.Now;
+                    db.userEvents.Add(userEventobj);
+                    db.SaveChanges(); }
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine(ex);
+            }
         }
     }
 

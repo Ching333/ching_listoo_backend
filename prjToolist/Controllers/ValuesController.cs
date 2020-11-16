@@ -104,6 +104,39 @@ namespace prjToolist.Controllers
             return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
+        [Route("get_user_event_count")]
+        [HttpPost]
+        [EnableCors("*", "*", "*")]
+        public HttpResponseMessage get_user_event_count()
+        {
+            
+            List<vmCountDataValues> allUserEventCount = new List<vmCountDataValues>();
+            var result = new
+            {
+                status = 0,
+                msg = "fail",
+                data = allUserEventCount
+
+            };
+
+            var userEventTotal = (from userEventsCount in db.userEvents
+                                  group userEventsCount by userEventsCount.userEvent1 into g
+                                  select new vmCountDataValues { key = g.Key.ToString(), count = g.Count() }).ToList();
+            
+            if (userEventTotal != null)
+            {
+                result = new
+                {
+                    status = 1,
+                    msg = "OK",
+                    data = userEventTotal
+
+                };
+            }
+            return Request.CreateResponse(HttpStatusCode.OK, result);
+        }
+
+
         [Route("get_all_data_count")]
         [HttpPost]
         [EnableCors("*", "*", "*")]

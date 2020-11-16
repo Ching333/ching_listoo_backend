@@ -91,6 +91,15 @@
           <Property Name="updated" Type="datetime2" Precision="0" />
           <Property Name="created" Type="datetime2" Precision="0" />
         </EntityType>
+        <EntityType Name="userEvent">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="int" Nullable="false" />
+          <Property Name="userEvent" Type="int" Nullable="false" />
+          <Property Name="created" Type="datetime" />
+        </EntityType>
         <EntityContainer Name="FUENMLModelStoreContainer">
           <EntitySet Name="place" EntityType="Self.place" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="placeList" EntityType="Self.placeList" Schema="dbo" store:Type="Tables" />
@@ -100,6 +109,7 @@
           <EntitySet Name="tagEvent" EntityType="Self.tagEvent" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="tagRelationship" EntityType="Self.tagRelationship" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="user" EntityType="Self.user" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="userEvent" EntityType="Self.userEvent" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
@@ -114,6 +124,7 @@
           <EntitySet Name="tagEvents" EntityType="FUENMLModel.tagEvent" />
           <EntitySet Name="tagRelationships" EntityType="FUENMLModel.tagRelationship" />
           <EntitySet Name="users" EntityType="FUENMLModel.user" />
+          <EntitySet Name="userEvents" EntityType="FUENMLModel.userEvent" />
         </EntityContainer>
         <EntityType Name="place">
           <Key>
@@ -200,6 +211,15 @@
           <Property Name="authority" Type="Int32" Nullable="false" />
           <Property Name="updated" Type="DateTime" Precision="0" />
           <Property Name="created" Type="DateTime" Precision="0" />
+        </EntityType>
+        <EntityType Name="userEvent">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int32" Nullable="false" />
+          <Property Name="userEvent1" Type="Int32" Nullable="false" />
+          <Property Name="created" Type="DateTime" Precision="3" />
         </EntityType>
         </Schema>
     </edmx:ConceptualModels>
@@ -293,6 +313,16 @@
                 <ScalarProperty Name="password" ColumnName="password" />
                 <ScalarProperty Name="email" ColumnName="email" />
                 <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="userEvents">
+            <EntityTypeMapping TypeName="FUENMLModel.userEvent">
+              <MappingFragment StoreEntitySet="userEvent">
+                <ScalarProperty Name="created" ColumnName="created" />
+                <ScalarProperty Name="userEvent1" ColumnName="userEvent" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
                 <ScalarProperty Name="id" ColumnName="id" />
               </MappingFragment>
             </EntityTypeMapping>

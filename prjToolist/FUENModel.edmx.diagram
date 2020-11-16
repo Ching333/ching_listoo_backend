@@ -13,6 +13,7 @@
         <EntityTypeShape EntityType="FUENMLModel.tagEvent" Width="1.5" PointX="4.75" PointY="3.75" />
         <EntityTypeShape EntityType="FUENMLModel.tagRelationship" Width="1.5" PointX="6.75" PointY="0.75" />
         <EntityTypeShape EntityType="FUENMLModel.user" Width="1.5" PointX="6.75" PointY="3.75" />
+        <EntityTypeShape EntityType="FUENMLModel.userEvent" Width="1.5" PointX="0.75" PointY="7.75" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

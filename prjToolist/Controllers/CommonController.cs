@@ -49,6 +49,7 @@ namespace prjToolist.Controllers
             };
 
             int userlogin = 0;
+            userFactory.userEventRecord(userlogin, 1, db);
             var entirePlaces = db.places.Select(p => p.id).ToList();
             var entirePlaceLists = db.placeLists.Select(p => p.id).ToList();
             int filterCount = filter.filter.Length;
@@ -142,6 +143,7 @@ namespace prjToolist.Controllers
                     allTagIdInList = allTagIdInList.Distinct().ToList();
                 }
                 if (allTagIdInList.Count > 0)
+
                 {
                     tagIdList = tagIdList.Intersect(allTagIdInList).ToArray();
                 }
@@ -181,6 +183,7 @@ namespace prjToolist.Controllers
             string[] typeList = db.places.Select(p => p.type).Distinct().ToArray();
             Array.Sort(idList); 
             List<tTag> tagList = new List<tTag>();
+            userFactory.userEventRecord(0, 3, db);
             var tagInfo = new
             {
                 system_tags = typeList,
@@ -235,6 +238,7 @@ namespace prjToolist.Controllers
             placeListInfo infoItem = new placeListInfo();
             int[] tFilterid = getListInfo.filter;
             int list_createrId = 0;
+            userFactory.userEventRecord(0, 1, db);
             var dataForm = new
             {
                 info = infoItem,

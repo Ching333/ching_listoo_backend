@@ -58,6 +58,7 @@ namespace prjToolist.Controllers
         [HttpPost]
         public HttpResponseMessage get_user_places(tagFilter tfilter)
         {
+            
             try
             {
                 int userlogin = 0;
@@ -84,6 +85,7 @@ namespace prjToolist.Controllers
                 userlogin = userFactory.userIsLoginSession(userlogin);//原本用Session
                 userlogin = userIsLoginCookie(userlogin);//改用Header
                                                          //if (userlogin == 0) { userlogin = 1; }
+                userFactory.userEventRecord(userlogin, 2, db);
                 if (userlogin != 0)
                 {
                     intersectResult = db.tagRelationships.Where(p => p.user_id == userlogin).Select(q => q.place_id).ToList();
@@ -226,7 +228,7 @@ namespace prjToolist.Controllers
                 //};
                 userlogin = userFactory.userIsLoginSession(userlogin);//原本用Session
                 userlogin = userIsLoginCookie(userlogin);//測試用Header找user id
-                                                         //if (userlogin == 0) { userlogin = 1; }
+                userFactory.userEventRecord(userlogin, 1, db);                                         //if (userlogin == 0) { userlogin = 1; }
                 var dataForm = new
                 {
                     lists = infoList,
@@ -309,14 +311,14 @@ namespace prjToolist.Controllers
                         //var searchplacehastag = db.tagRelations.Where(P => P.tag_id == i).Select(q => q.place_id).ToList();
                         //searchplacehastag = searchplacehastag.Distinct().ToList();
                         //intersectResult = intersectResult.Intersect(searchplacehastag).ToList();
-                        if (editorIdList.Count > 0)
-                        {
-                            foreach (int editorId in editorIdList)
-                            {
-                                var editTagPlace = db.tagRelationships.Where(p => p.user_id == editorId && p.tag_id == i).Select(q => q.place_id).ToList();
-                                if (editTagPlace != null) { intersectResult.AddRange(editTagPlace); }
-                            }
-                        }
+                        //if (editorIdList.Count > 0)
+                        //{
+                        //    foreach (int editorId in editorIdList)
+                        //    {
+                        //        var editTagPlace = db.tagRelationships.Where(p => p.user_id == editorId && p.tag_id == i).Select(q => q.place_id).ToList();
+                        //        if (editTagPlace != null) { intersectResult.AddRange(editTagPlace); }
+                        //    }
+                        //}
                     }
                     intersectResult = intersectResult.Distinct().ToList();
 
@@ -349,8 +351,8 @@ namespace prjToolist.Controllers
                     {
                         var placeItem = db.places.Where(p => p.id == j).FirstOrDefault();
                         if (placeItem.type != null) { systemTagResult.Add(placeItem.type); }
-                        //篩選出這些地點的所有tag
-                        tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == j).Select(q => q.tag_id).ToList());
+                        //篩選出這些地點的所有登入使用者的tag
+                        tagsList.AddRange(db.tagRelationships.Where(p => p.place_id == j&&p.user_id==userlogin).Select(q => q.tag_id).ToList());
                     }
                     tagsList = tagsList.Distinct().ToList();//最終tag結果
                     systemTagResult = systemTagResult.Distinct().ToList();
@@ -463,6 +465,7 @@ namespace prjToolist.Controllers
             //}
             userlogin = userFactory.userIsLoginSession(userlogin);
             userlogin = userIsLoginCookie(userlogin);
+            userFactory.userEventRecord(userlogin, 1, db);
             placeListInfo infoItem = new placeListInfo();
             List<string> editorEmailList = new List<string>();
             int list_createrId = 0;
@@ -1243,6 +1246,7 @@ namespace prjToolist.Controllers
             int[] item = tagList.Distinct().ToArray();
             userlogin = userFactory.userIsLoginSession(userlogin);
             userlogin = userIsLoginCookie(userlogin);
+            userFactory.userEventRecord(userlogin, 3, db);
             var dataForm = new
             {
                 my_tags = myTags,

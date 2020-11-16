@@ -33,5 +33,6 @@ namespace prjToolist
         public virtual DbSet<tagEvent> tagEvents { get; set; }
         public virtual DbSet<tagRelationship> tagRelationships { get; set; }
         public virtual DbSet<user> users { get; set; }
+        public virtual DbSet<userEvent> userEvents { get; set; }
     }
 }
