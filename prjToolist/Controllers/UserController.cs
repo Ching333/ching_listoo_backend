@@ -377,8 +377,9 @@ namespace prjToolist.Controllers
                         foreach (int j in intersectResult)
                         {
                             placesList.AddRange(db.placeRelationships.Where(p => p.place_id == j).Select(q => q.placelist_id).ToList());
-                            userList = userList.Intersect(placesList).ToList();
                         }
+                        placesList = placesList.Distinct().ToList();
+                        userList = userList.Intersect(placesList).ToList();
                         userList = userList.Distinct().ToList();//最終清單結果
                     }
 
